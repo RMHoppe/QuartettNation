@@ -1,0 +1,154 @@
+.battle-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.85);
+    backdrop-filter: blur(8px);
+    z-index: 100;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: var(--spacing-lg);
+}
+
+.battle-category {
+    font-size: 2rem;
+    color: var(--text-dim);
+    margin-bottom: var(--spacing-xl);
+    text-transform: uppercase;
+    letter-spacing: 2px;
+}
+
+.battle-category span {
+    color: var(--accent);
+    font-weight: 800;
+    text-shadow: 0 0 20px rgba(245, 158, 11, 0.4);
+}
+
+.battle-arena {
+    display: flex;
+    gap: var(--spacing-xl);
+    align-items: center;
+    justify-content: center;
+    flex-wrap: wrap;
+    perspective: 1500px;
+}
+
+.battle-card-slot {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--spacing-sm);
+}
+
+.player-label {
+    font-weight: 600;
+    color: var(--text);
+}
+
+.battle-card-wrapper {
+    width: 240px;
+    /* Slightly smaller than full size to fit multiple */
+    aspect-ratio: 2/3;
+    aspect-ratio: 2/3;
+    position: relative;
+}
+
+.battle-card-wrapper .card-container {
+    width: 100% !important;
+    height: 100% !important;
+    max-width: none;
+    border: none;
+    /* Optional: remove border if wrapper has one, but wrapper doesn't */
+}
+
+/* 3D Flip */
+.flip-container {
+    width: 100%;
+    height: 100%;
+    position: relative;
+    transform-style: preserve-3d;
+    transition: transform 0.6s cubic-bezier(0.4, 0.0, 0.2, 1);
+}
+
+.flip-container.flipped .flipper {
+    transform: rotateY(0deg);
+}
+
+/* Initial state for opponents is back facing forward, so logic might be inverted in CSS or JS. 
+   Let's stick to standard: Front is content, Back is pattern. 
+   If faceDown=true, we show Back. 
+   But here we are using CSS transform rotateY.
+*/
+.flipper {
+    width: 100%;
+    height: 100%;
+    position: relative;
+    transform-style: preserve-3d;
+    transition: transform 0.8s;
+}
+
+/* If the logic in JSX is: !isFaceDown ? 'flipped' : '' 
+   And we want faceDown to mean BACK is visible.
+   Let's define: 0deg = Front, 180deg = Back.
+*/
+.flip-container:not(.flipped) .flipper {
+    transform: rotateY(180deg);
+}
+
+.front,
+.back {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    backface-visibility: hidden;
+    -webkit-backface-visibility: hidden;
+}
+
+.front {
+    transform: rotateY(0deg);
+    z-index: 2;
+}
+
+.back {
+    transform: rotateY(180deg);
+}
+
+/* Highlights */
+.stat-highlight {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: var(--accent);
+    color: #000;
+    font-weight: 900;
+    font-size: 3rem;
+    padding: var(--spacing-md);
+    border-radius: var(--radius-md);
+    box-shadow: 0 0 30px rgba(245, 158, 11, 0.6);
+    z-index: 10;
+    pointer-events: none;
+}
+
+.winner-banner {
+    position: absolute;
+    bottom: 20%;
+    font-size: 4rem;
+    font-weight: 900;
+    color: #fff;
+    text-shadow: 0 5px 15px rgba(0, 0, 0, 0.5);
+    background: linear-gradient(90deg, transparent, var(--success), transparent);
+    padding: 0 50px;
+    z-index: 20;
+    text-align: center;
+}
+
+.winner-banner.war-banner {
+    background: linear-gradient(90deg, transparent, var(--danger), transparent);
+}

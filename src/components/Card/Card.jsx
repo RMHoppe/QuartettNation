@@ -1,7 +1,9 @@
 import React from 'react'
+import CardBack from './CardBack'
 import './Card.css'
 
-const Card = ({ card, categories, compact = false, onCategorySelect, isSelectable = false, deckName }) => {
+const Card = ({ card, categories, compact = false, onCategorySelect, isSelectable = false, deckName, faceDown = false }) => {
+    if (faceDown) return <div className={`card-container ${compact ? 'compact' : ''}`}><CardBack /></div>
     if (!card) return null
 
     return (

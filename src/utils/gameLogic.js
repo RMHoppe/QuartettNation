@@ -23,6 +23,7 @@ export function resolveRound(gameState, deckData, category) {
 
         return {
             playerId: p.id,
+            playerName: p.name,
             card,
             value
         };
@@ -55,7 +56,7 @@ export function resolveRound(gameState, deckData, category) {
         state.pot = newPot;
         state.warMode = true;
         state.warParticipants = ties.map(t => t.playerId);
-        state.lastRound = { category, winner: null, cards: playedCards };
+        state.lastRound = { category, winner: null, winnerName: null, cardsPlayed: playedCards };
         // Turn player stays effectively the same (or first tied player) to initiate next battle
         // Logic: active player must be one of the tied players
         state.turnPlayerId = ties[0].playerId;
@@ -72,7 +73,7 @@ export function resolveRound(gameState, deckData, category) {
         state.warMode = false;
         state.warParticipants = null;
         state.turnPlayerId = winnerId; // Winner starts next
-        state.lastRound = { category, winner: winnerId, cards: playedCards };
+        state.lastRound = { category, winner: winnerId, winnerName: winner.name, cardsPlayed: playedCards };
     }
 
     // 4. Eliminate empty hands

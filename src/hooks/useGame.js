@@ -132,7 +132,7 @@ export function useGame(gameId) {
     };
 
     const playTurn = async (categoryName) => {
-        if (!isHost) return;
+        if (!isMyTurn) return;
 
         // Import logic dynamic or static
         const { resolveRound } = await import('../utils/gameLogic');

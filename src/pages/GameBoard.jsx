@@ -1,6 +1,8 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import Card from '../components/Card/Card';
 import { Button } from '../ui';
+import { AnimatePresence } from 'framer-motion';
+import BattleOverlay from '../components/Game/BattleOverlay';
 import './GameBoard.css'; // We'll create this css next
 
 const GameBoard = ({ matchId, gameState, myPlayer, deck, actions, isMyTurn }) => {
@@ -15,6 +17,20 @@ const GameBoard = ({ matchId, gameState, myPlayer, deck, actions, isMyTurn }) =>
     const potSize = gameState.pot.length;
     const lastRound = gameState.lastRound;
 
+    const [showBattle, setShowBattle] = useState(false);
+    const prevRoundRef = React.useRef(null);
+
+    useEffect(() => {
+        // Trigger animation when lastRound updates (and is not null/empty)
+        // We compare with refined ref to ensure we don't re-trigger on same round
+        console.log("GameBoard: Checking lastRound update", { lastRound, prev: prevRoundRef.current });
+        if (lastRound && lastRound !== prevRoundRef.current) {
+            console.log("GameBoard: New round detected, triggering battle animation", lastRound);
+            setShowBattle(true);
+            prevRoundRef.current = lastRound;
+        }
+    }, [lastRound]);
+
     if (gameState.status === 'completed' && winner) {
         return (
             <div className="game-board-container game-over">
@@ -25,19 +41,9 @@ const GameBoard = ({ matchId, gameState, myPlayer, deck, actions, isMyTurn }) =>
         );
     }
 
-    // If I am eliminated
-    if (myPlayer.eliminated) {
-        return (
-            <div className="game-board-container eliminated">
-                <h1>You have been eliminated!</h1>
-                <p>Watching the rest of the game...</p>
-                {/* We could show the active game view here in 'spectator' mode effectively 
-                    by just rendering the board but locking inputs. 
-                    For MVP, let's just show the board but with overlay.
-                */}
-            </div>
-        );
-    }
+    // If I am eliminated, we don't return early anymore.
+    // Instead we obscure the controls.
+    const isEliminated = myPlayer.eliminated;
 
     return (
         <div className="game-board-container">
@@ -51,16 +57,18 @@ const GameBoard = ({ matchId, gameState, myPlayer, deck, actions, isMyTurn }) =>
                 </div>
             </div>
 
-            {/* Last Round Preview (if active) */}
-            {/* Ideally we show this for a few seconds. Since we rely on simple state, 
-                we show it constantly until next move? Or maybe just a sidebar log.
-                Let's make a simple overlay or section for "Last Hand".
-            */}
-            {lastRound && !isWar && (
-                <div className="last-round-info">
-                    Last Winner: {gameState.players.find(p => p.id === lastRound.winner)?.name} via {lastRound.category}
-                </div>
-            )}
+            {/* Battle Animation Overlay */}
+            <AnimatePresence>
+                {showBattle && lastRound && (
+                    <BattleOverlay
+                        roundData={lastRound}
+                        myPlayerId={myPlayer.id}
+                        onComplete={() => setShowBattle(false)}
+                    />
+                )}
+            </AnimatePresence>
+
+            {/* Header Info */}
 
             {/* Opponents Area */}
             <div className="opponents-strip">
@@ -92,28 +100,30 @@ const GameBoard = ({ matchId, gameState, myPlayer, deck, actions, isMyTurn }) =>
 
                 {/* Controls */}
                 <div className="controls-section">
-                    {/* Hiding old buttons as requested
-                    {isMyTurn && !winner && (
-                        <div className="category-buttons"> ... </div>
+
+                    {isEliminated && (
+                        <div className="eliminated-message">
+                            <h3>You have been eliminated</h3>
+                            <p>Spectating the game...</p>
+                        </div>
                     )}
-                    */}
-                    {isMyTurn && !winner && (
+
+                    {!isEliminated && isMyTurn && !winner && (
                         <div className="text-center text-primary mt-4 animate-pulse">
                             &uarr; Select a category on the card above &uarr;
                         </div>
                     )}
 
-                    {!isMyTurn && (
+                    {!isEliminated && !isMyTurn && (
                         <div className="waiting-message">
                             Waiting for opponent...
                         </div>
                     )}
 
-                    {isWar && isMyTurn && (
+                    {!isEliminated && isWar && isMyTurn && (
                         <div className="war-alert">
                             <h3>WAR!</h3>
                             <p>Tie detected. Select category to break tie (must be same usually, but you have choice).</p>
-                            {/* Re-render buttons above */}
                         </div>
                     )}
                 </div>

@@ -9,7 +9,7 @@ const GameLobby = ({ matchId, players, isHost, onStart }) => {
     };
 
     return (
-        <div className="app-card">
+        <div className="page-view app-card">
             <div className="lobby-header" style={{ paddingTop: 0 }}>
                 {/* Title moved to app header */}
                 <p className="lobby-subtitle" style={{ marginTop: 0 }}>Waiting for players to join...</p>

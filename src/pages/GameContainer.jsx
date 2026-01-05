@@ -33,19 +33,22 @@ const GameContainer = () => {
     // Identify if user is logged in (part of players)
     if (!myPlayer) {
         return (
-            <div className="max-w-md mx-auto mt-20 p-6 bg-gray-800 rounded-lg text-center">
-                <h2 className="text-2xl mb-4 text-white">Join Game</h2>
-                <input
-                    type="text"
-                    placeholder="Enter your name"
-                    className="w-full p-2 mb-4 rounded text-black"
-                    value={joinName}
-                    onChange={e => setJoinName(e.target.value)}
-                />
+            <div className="page-view app-card centered">
+                <h2>Join Game</h2>
+                <div className="input-group" style={{ width: '100%', maxWidth: '300px' }}>
+                    <input
+                        type="text"
+                        placeholder="Enter your name"
+                        value={joinName}
+                        onChange={e => setJoinName(e.target.value)}
+                        onKeyDown={e => e.key === 'Enter' && joinName.trim() && actions.join(joinName)}
+                    />
+                </div>
                 <Button
                     variant="primary"
                     disabled={!joinName.trim()}
                     onClick={() => actions.join(joinName)}
+                    style={{ width: '100%', maxWidth: '300px' }}
                 >
                     Join Lobby
                 </Button>
