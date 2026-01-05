@@ -1,0 +1,146 @@
+.game-board-container {
+    padding: var(--spacing-xl);
+    /* padding-bottom removed; handled by layout */
+    max-width: 1200px;
+    margin: 0 auto;
+    color: var(--text);
+    /* min-height handled by flex layout */
+    display: flex;
+    flex-direction: column;
+}
+
+.game-header {
+    display: flex;
+    justify-content: space-between;
+    font-size: 1.5rem;
+    font-weight: bold;
+    margin-bottom: var(--spacing-xl);
+    padding-bottom: var(--spacing-md);
+    border-bottom: 1px solid var(--glass-border);
+}
+
+.turn-indicator {
+    color: var(--accent-gold);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.war-badge {
+    background: var(--danger);
+    color: white;
+    padding: 2px var(--spacing-sm);
+    border-radius: 4px;
+    font-size: 1rem;
+    animation: pulse 1s infinite;
+}
+
+@keyframes pulse {
+    0% {
+        transform: scale(1);
+    }
+
+    50% {
+        transform: scale(1.1);
+    }
+
+    100% {
+        transform: scale(1);
+    }
+}
+
+.opponents-strip {
+    display: flex;
+    justify-content: center;
+    gap: var(--spacing-xl);
+    margin-bottom: var(--spacing-xl);
+}
+
+.opponent-card {
+    background: rgba(255, 255, 255, 0.05);
+    /* Could define var(--surface-light) */
+    padding: var(--spacing-md);
+    border-radius: var(--radius-sm);
+    min-width: 120px;
+    text-align: center;
+    border: 2px solid transparent;
+}
+
+.opponent-card.active-turn {
+    border-color: var(--accent-gold);
+    background: rgba(255, 215, 0, 0.1);
+}
+
+.opponent-card.eliminated-p {
+    opacity: 0.5;
+    text-decoration: line-through;
+}
+
+.opponent-avatar {
+    font-size: 2rem;
+    margin-bottom: var(--spacing-sm);
+}
+
+.main-play-area {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--spacing-xl);
+    flex: 1;
+}
+
+.my-card-section {
+    transform: scale(1.1);
+    transition: transform 0.3s;
+}
+
+.controls-section {
+    width: 100%;
+    max-width: 600px;
+    text-align: center;
+}
+
+.category-buttons h3 {
+    margin-bottom: var(--spacing-md);
+    color: #ccc;
+    /* Could be var(--text-dim) */
+}
+
+.buttons-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: var(--spacing-md);
+}
+
+.cat-btn {
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    color: white;
+    padding: var(--spacing-md);
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+    transition: all 0.2s;
+    font-weight: 600;
+    text-transform: uppercase;
+}
+
+.cat-btn:hover {
+    background: var(--primary);
+    border-color: var(--primary);
+    transform: translateY(-2px);
+}
+
+.waiting-message {
+    font-style: italic;
+    color: var(--text-dim);
+    margin-top: var(--spacing-xl);
+}
+
+.last-round-info {
+    text-align: center;
+    background: rgba(0, 0, 0, 0.3);
+    padding: 0.5rem;
+    border-radius: 4px;
+    margin-bottom: var(--spacing-md);
+    font-size: 0.9rem;
+    color: var(--text-dim);
+}

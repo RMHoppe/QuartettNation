@@ -1,0 +1,31 @@
+.model-selector {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 1rem;
+}
+
+.model-selector label {
+    color: var(--text-dim);
+    font-size: 0.85rem;
+}
+
+.model-selector select {
+    padding: 0.4rem 0.8rem;
+    border-radius: 6px;
+    border: 1px solid var(--border);
+    background: var(--surface);
+    color: var(--text);
+    font-size: 0.85rem;
+    cursor: pointer;
+}
+
+.model-selector select:focus {
+    outline: none;
+    border-color: var(--primary);
+}
+
+.model-selector-loading {
+    color: var(--text-dim);
+    font-size: 0.8rem;
+}

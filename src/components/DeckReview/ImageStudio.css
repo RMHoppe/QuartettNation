@@ -1,0 +1,117 @@
+.image-studio {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    gap: var(--spacing-md);
+}
+
+.studio-card-info {
+    text-align: center;
+}
+
+.studio-hint {
+    font-size: 0.8rem;
+    color: var(--text-dim);
+}
+
+.cropper-stage {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(0, 0, 0, 0.5);
+    border-radius: var(--radius-md);
+    overflow: hidden;
+    position: relative;
+    min-height: 300px;
+}
+
+.cropper-mask {
+    width: 250px;
+    aspect-ratio: 2/3;
+    /* height: auto; based on aspect key */
+    border: 2px solid var(--primary);
+    box-shadow: 0 0 0 999px rgba(0, 0, 0, 0.7);
+    overflow: hidden;
+    position: relative;
+    border-radius: var(--radius-lg);
+    /* Match card radius for better preview */
+}
+
+.cropper-mask img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    touch-action: none;
+    transform-origin: center;
+}
+
+.alternatives-strip {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-sm);
+}
+
+.alternatives-strip h4 {
+    font-size: 0.8rem;
+    color: var(--text-dim);
+    text-transform: uppercase;
+    margin: 0;
+}
+
+.thumbnails {
+    display: flex;
+    gap: var(--spacing-sm);
+    overflow-x: auto;
+    padding-bottom: 4px;
+}
+
+.thumbnails img {
+    width: 60px;
+    height: 60px;
+    border-radius: var(--radius-sm);
+    object-fit: cover;
+    border: 2px solid transparent;
+    cursor: pointer;
+    flex-shrink: 0;
+}
+
+.thumbnails img.active {
+    border-color: var(--primary);
+}
+
+.studio-nav {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-top: var(--spacing-sm);
+}
+
+.nav-btn-round {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    background: var(--surface);
+    border: 1px solid var(--glass-border);
+    color: var(--text);
+    font-size: 1.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.nav-btn-round:disabled {
+    opacity: 0.3;
+}
+
+.nav-btn-round.primary {
+    background: var(--primary);
+    border-color: var(--primary);
+    color: white;
+}
+
+.card-counter {
+    font-variant-numeric: tabular-nums;
+    font-weight: 600;
+    color: var(--text-dim);
+}

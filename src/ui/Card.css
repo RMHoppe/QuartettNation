@@ -1,0 +1,33 @@
+.ui-card {
+    background: var(--surface);
+    border: 1px solid var(--glass-border);
+    border-radius: var(--radius-md);
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+/* Padding variants */
+.ui-card-p-none {
+    padding: 0;
+}
+
+.ui-card-p-sm {
+    padding: var(--spacing-sm);
+}
+
+.ui-card-p-md {
+    padding: var(--spacing-md);
+}
+
+.ui-card-p-lg {
+    padding: var(--spacing-lg);
+}
+
+/* Interactive states */
+.ui-card-hoverable:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+}
+
+.ui-card-clickable {
+    cursor: pointer;
+}

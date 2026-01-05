@@ -1,0 +1,229 @@
+:root {
+  /* Colors - Modern, vibrant palette */
+  --primary: #6366f1;
+  --primary-glow: rgba(99, 102, 241, 0.4);
+  --secondary: #ec4899;
+  --accent: #f59e0b;
+  --accent-gold: #ffd700;
+  --background: #0f172a;
+  --surface: #1e293b;
+  --surface-alt: #334155;
+  --text: #f8fafc;
+  --text-dim: #94a3b8;
+  --success: #10b981;
+  --danger: #ef4444;
+
+  /* Glassmorphism */
+  --glass: rgba(30, 41, 59, 0.7);
+  --glass-border: rgba(255, 255, 255, 0.1);
+  --glass-blur: blur(12px);
+
+  /* Spacing & Radii */
+  --radius-sm: 8px;
+  --radius-md: 16px;
+  --radius-lg: 24px;
+  --spacing-xs: 4px;
+  --spacing-sm: 8px;
+  --spacing-md: 16px;
+  --spacing-lg: 24px;
+  --spacing-lg: 24px;
+  --spacing-xl: 32px;
+
+  --footer-height: 60px;
+
+  /* Card Dimensions */
+  --card-aspect: 2/3;
+  --card-width: 90vw;
+  --card-max-width: 380px;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  -webkit-tap-highlight-color: transparent;
+}
+
+body {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  background-color: var(--background);
+  color: var(--text);
+  line-height: 1.5;
+  overflow-x: hidden;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+#root {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+h1,
+h2,
+h3 {
+  font-weight: 700;
+  letter-spacing: -0.025em;
+}
+
+button {
+  font-family: inherit;
+  cursor: pointer;
+  border: none;
+  background: none;
+  transition: all 0.2s ease;
+}
+
+/* Base Layout Helpers */
+.container {
+  width: 100%;
+  max-width: var(--card-max-width);
+  margin: 0 auto;
+  padding: var(--spacing-md);
+}
+
+/* Standardized List Styles */
+.modern-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-sm);
+}
+
+.modern-list-item {
+  background: var(--surface);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-sm);
+  padding: var(--spacing-md);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  transition: all 0.2s ease;
+}
+
+.modern-list-item:hover {
+  background: var(--surface-alt);
+  transform: translateX(2px);
+}
+
+.modern-list-item.vertical {
+  flex-direction: column;
+  align-items: stretch;
+  gap: var(--spacing-sm);
+}
+
+.modern-list-item.align-start {
+  align-items: flex-start;
+}
+
+.glass-panel {
+  background: var(--glass);
+  backdrop-filter: var(--glass-blur);
+  -webkit-backdrop-filter: var(--glass-blur);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-md);
+}
+
+/* Global App Card Style (Lobby-like container) */
+.app-card {
+  max-width: 800px;
+  margin: var(--spacing-lg) 0;
+  border-radius: var(--radius-lg);
+  background: linear-gradient(to bottom, #1a2332 0%, #111827 100%);
+  box-shadow: 0 0 40px rgba(0, 0, 0, 0.5);
+  padding: var(--spacing-lg);
+  border: 1px solid var(--glass-border);
+}
+
+.gradient-text {
+  background: linear-gradient(135deg, #fff 0%, var(--primary-light, #a5b4fc) 100%);
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  /* Required for gradient text sometimes */
+}
+
+/* Standardized Grid Styles */
+.modern-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: var(--spacing-md);
+}
+
+.modern-grid.dense {
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: var(--spacing-sm);
+}
+
+/* --- Page & View Containers --- */
+.page-view {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-lg);
+  width: 100%;
+}
+
+.page-view.centered {
+  align-items: center;
+}
+
+/* --- Home Page Specifics --- */
+.hero-title {
+  font-size: 2.5rem;
+  line-height: 1.1;
+  margin-bottom: var(--spacing-sm);
+  /* Inherit gradient-text behavior if applied, otherwise default text */
+}
+
+.hero-subtitle {
+  color: var(--text-dim);
+  font-size: 1.1rem;
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+.card-preview {
+  display: flex;
+  justify-content: center;
+  padding: var(--spacing-md) 0;
+  perspective: 1000px;
+  transform-style: preserve-3d;
+}
+
+.recent-games h3 {
+  margin-bottom: var(--spacing-md);
+  font-size: 0.9rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--text-dim);
+}
+
+/* --- Form & Inputs --- */
+.input-group {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-xs);
+  width: 100%;
+}
+
+.input-group label {
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--text-dim);
+}
+
+/* Replaces .back-link */
+.link-back {
+  color: var(--primary);
+  font-weight: 500;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  margin-bottom: var(--spacing-md);
+}
+
+.link-back:hover {
+  text-decoration: underline;
+}

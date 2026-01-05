@@ -1,0 +1,57 @@
+-- Enable Row Level Security (RLS)
+alter default privileges revoke execute on functions from public;
+
+-- DECKS TABLE
+create table decks (
+  id uuid default gen_random_uuid() primary key,
+  created_at timestamp with time zone default timezone('utc'::text, now()) not null,
+  name text not null,
+  theme text not null,
+  categories jsonb not null -- Stores the 4-6 categories and units
+);
+
+-- CARDS TABLE
+create table cards (
+  id uuid default gen_random_uuid() primary key,
+  deck_id uuid references decks(id) on delete cascade not null,
+  name text not null,
+  image_url text, -- URLs to processed images
+  attribution_text text,
+  attributes jsonb not null -- Stores the numerical values for categories
+);
+
+-- GAMES TABLE (For Multiplayer)
+create table games (
+  id uuid default gen_random_uuid() primary key,
+  created_at timestamp with time zone default timezone('utc'::text, now()) not null,
+  expires_at timestamp with time zone default (now() + interval '1 week'),
+  host_deck_id uuid references decks(id),
+  challenger_deck_id uuid references decks(id),
+  status text default 'waiting_for_challenger', -- 'waiting_for_challenger', 'active', 'completed', 'expired'
+  current_turn_player text, -- 'host' or 'challenger'
+  game_state jsonb default '{}'::jsonb -- Stores current hands, scores, etc.
+);
+
+-- RLS POLICIES (Simple public access for this MVP)
+alter table decks enable row level security;
+alter table cards enable row level security;
+alter table games enable row level security;
+
+-- Allow anyone to read decks/cards (public catalog)
+create policy "Public decks are viewable by everyone" on decks for select using (true);
+create policy "Public cards are viewable by everyone" on cards for select using (true);
+
+-- Allow anyone to create decks (for the 'Guest' flow)
+create policy "Anyone can insert decks" on decks for insert with check (true);
+create policy "Anyone can delete decks" on decks for delete using (true);
+create policy "Anyone can insert cards" on cards for insert with check (true);
+
+-- Games policies
+create policy "Public games are viewable by everyone" on games for select using (true);
+create policy "Anyone can insert games" on games for insert with check (true);
+create policy "Anyone can update games" on games for update using (true);
+
+
+-- ENABLE REALTIME
+-- Required for multiplayer updates to be broadcast to clients
+alter publication supabase_realtime add table games;

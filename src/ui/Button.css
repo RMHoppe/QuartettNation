@@ -1,0 +1,121 @@
+.btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--spacing-sm);
+    font-weight: 600;
+    border-radius: var(--radius-md);
+    cursor: pointer;
+    transition: all 0.2s ease;
+    position: relative;
+    border: none;
+    /* Reset default border */
+    min-height: 48px;
+    /* Ensure touch target size */
+}
+
+/* Fallback spacing for buttons not in a flex gap container */
+.btn+.btn {
+    margin-left: var(--spacing-sm);
+}
+
+/* If inside a flex container with gap, remove margin to avoid double spacing */
+.btn-group>.btn+.btn,
+.modern-list-item>.btn+.btn,
+div[class*="flex"][class*="gap"]>.btn+.btn {
+    margin-left: 0;
+}
+
+/* Sizes */
+.btn-sm {
+    padding: 0 var(--spacing-md);
+    font-size: 0.85rem;
+    border-radius: var(--radius-sm);
+    min-height: 36px;
+}
+
+.btn-md {
+    padding: 0 var(--spacing-lg);
+    font-size: 1rem;
+    min-height: 48px;
+}
+
+.btn-lg {
+    padding: var(--spacing-md) var(--spacing-xl);
+    font-size: 1.1rem;
+}
+
+/* Variants */
+.btn-primary {
+    background: linear-gradient(135deg, var(--primary) 0%, #4f46e5 100%);
+    color: white;
+    box-shadow: 0 4px 12px -2px var(--primary-glow);
+}
+
+.btn-primary:hover:not(:disabled) {
+    transform: translateY(-1px);
+    box-shadow: 0 6px 16px -2px var(--primary-glow);
+}
+
+.btn-secondary {
+    background: var(--surface);
+    color: var(--text);
+    border: 1px solid var(--glass-border);
+}
+
+.btn-secondary:hover:not(:disabled) {
+    background: var(--surface-alt);
+}
+
+.btn-ghost {
+    background: transparent;
+    color: var(--text-dim);
+}
+
+.btn-ghost:hover:not(:disabled) {
+    color: var(--text);
+    background: rgba(255, 255, 255, 0.05);
+}
+
+.btn-danger {
+    background: var(--danger);
+    color: white;
+}
+
+.btn-danger:hover:not(:disabled) {
+    filter: brightness(1.1);
+}
+
+/* States */
+.btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.btn-full {
+    width: 100%;
+}
+
+/* Loading */
+.btn-loading {
+    pointer-events: none;
+}
+
+.btn-spinner {
+    width: 16px;
+    height: 16px;
+    border: 2px solid currentColor;
+    border-top-color: transparent;
+    border-radius: 50%;
+    animation: btn-spin 0.7s linear infinite;
+}
+
+.btn-text-hidden {
+    visibility: hidden;
+}
+
+@keyframes btn-spin {
+    to {
+        transform: rotate(360deg);
+    }
+}

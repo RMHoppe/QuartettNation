@@ -1,0 +1,90 @@
+.deck-review-container {
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+    background: var(--background);
+    position: fixed;
+    top: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 100%;
+    max-width: 600px;
+    z-index: 50;
+    overflow: hidden;
+    box-shadow: 0 0 50px rgba(0, 0, 0, 0.5);
+    /* Shadow to separate from potential empty space on wide screens */
+}
+
+.review-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: var(--spacing-md);
+    background: var(--surface);
+    border-bottom: 1px solid var(--glass-border);
+    height: 60px;
+}
+
+.review-header h2 {
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--text);
+}
+
+.step-indicator {
+    font-size: 0.8rem;
+    color: var(--text-dim);
+    font-variant-numeric: tabular-nums;
+}
+
+.review-content {
+    flex: 1;
+    overflow-y: auto;
+    padding: var(--spacing-md);
+    max-width: 600px;
+    width: 100%;
+    margin: 0 auto;
+}
+
+/* Shared styles for sub-components */
+.review-actions {
+    display: flex;
+    justify-content: flex-end;
+    padding-top: var(--spacing-lg);
+    margin-top: auto;
+}
+
+.category-inputs {
+    display: flex;
+    gap: var(--spacing-sm);
+    flex: 1;
+}
+
+/* Overrides for UI components in this context */
+.category-input-override .input-field {
+    background: rgba(0, 0, 0, 0.2);
+    border-color: transparent;
+    padding: 4px 8px;
+}
+
+.category-input-override .input-field:focus {
+    border-color: var(--primary);
+}
+
+.toggle-btn-override {
+    width: 90px;
+    padding: 4px;
+    font-size: 0.75rem;
+}
+
+.card-name-input-override .input-field {
+    background: transparent;
+    border: none;
+    padding: 4px;
+    height: auto;
+}
+
+.card-name-input-override .input-field:focus {
+    background: rgba(255, 255, 255, 0.05);
+    box-shadow: none;
+}

@@ -1,0 +1,6 @@
+/* Collection specific styles if any remain */
+.deck-actions {
+    display: flex;
+    gap: var(--spacing-sm);
+    justify-content: flex-end;
+}
