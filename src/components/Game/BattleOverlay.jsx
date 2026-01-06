@@ -4,54 +4,89 @@ import Card from '../Card/Card';
 import './BattleOverlay.css';
 
 const BattleOverlay = ({ roundData, myPlayerId, onComplete }) => {
-    console.log("BattleOverlay mounted. RoundData:", roundData);
+    // History fallback for backward compatibility
+    const history = roundData.warHistory || [roundData];
 
+    // We track which round of the war we are currently displaying
+    const [roundIdx, setRoundIdx] = useState(0);
     const [step, setStep] = useState('enter'); // enter, reveal, compare, exit
+    const [showWarBanner, setShowWarBanner] = useState(false);
 
+    // reset if roundData changes strictly (new battle entirely)
     useEffect(() => {
-        console.log("BattleOverlay: Sequence starting");
-        // Sequence the animation steps
-        const sequence = async () => {
-            // 1. Enter (cards slide in) - handled by initial render
-            await new Promise(r => setTimeout(r, 1000));
+        setRoundIdx(0);
+        setStep('enter');
+        setShowWarBanner(false);
+    }, [roundData]);
 
-            // 2. Reveal (flip opponent cards)
-            console.log("BattleOverlay: Stepping to REVEAL");
-            setStep('reveal');
-            await new Promise(r => setTimeout(r, 1500));
+    // Sequence controller
+    useEffect(() => {
+        console.log("BattleOverlay: Sequence starting for history length:", history.length);
 
-            // 3. Compare (highlight winner)
-            console.log("BattleOverlay: Stepping to COMPARE");
-            setStep('compare');
-            await new Promise(r => setTimeout(r, 2000));
+        let mounted = true;
 
-            // 4. Exit
-            console.log("BattleOverlay: Stepping to EXIT");
+        const runSequence = async () => {
+            // Loop through each round in the history
+            for (let i = 0; i < history.length; i++) {
+                if (!mounted) return;
+
+                // 0. Setup State for this round
+                setRoundIdx(i);
+                setStep('enter');
+                setShowWarBanner(false);
+
+                // 1. Enter (cards slide in)
+                await new Promise(r => setTimeout(r, 1000));
+                if (!mounted) return;
+
+                // 2. Reveal (flip opponent cards)
+                setStep('reveal');
+                await new Promise(r => setTimeout(r, 1500));
+                if (!mounted) return;
+
+                // 3. Compare (highlight winner or tie)
+                setStep('compare');
+                await new Promise(r => setTimeout(r, 2000));
+                if (!mounted) return;
+
+                const isLast = i === history.length - 1;
+
+                if (!isLast) {
+                    // It's a Tie/War step
+                    setShowWarBanner(true);
+                    await new Promise(r => setTimeout(r, 1500));
+                    if (!mounted) return;
+
+                    // Transition to next round - clear cards briefly
+                    setStep('exit'); // Optional: fade out
+                    await new Promise(r => setTimeout(r, 500));
+                } else {
+                    // Final Winner
+                    // Just wait a bit more to bask in glory
+                    await new Promise(r => setTimeout(r, 1500));
+                }
+            }
+
+            if (!mounted) return;
+            // 4. Final Exit
             setStep('exit');
             await new Promise(r => setTimeout(r, 500));
             onComplete && onComplete();
         };
 
-        sequence();
-    }, []);
+        runSequence();
 
-    if (!roundData || !roundData.cardsPlayed) {
-        console.error("BattleOverlay: Missing roundsData or cardsPlayed", roundData);
-        return null;
-    }
+        return () => { mounted = false; };
+    }, [roundData]); // Re-run if roundData changes (new battle)
 
-    // Helper to find the card played by a specific player
-    const getCardForPlayer = (playerId) => {
-        const played = roundData.cardsPlayed.find(cp => cp.playerId === playerId);
-        return played ? played.card : null;
-    };
+    if (!roundData) return null;
 
-    const winnerId = roundData.winner;
-    const categoryName = roundData.category;
-    const myCardInfo = roundData.cardsPlayed.find(cp => cp.playerId === myPlayerId);
+    const currentRound = history[roundIdx];
+    if (!currentRound || !currentRound.cardsPlayed) return null;
 
-    // We only show My Card vs The Winner (or if I am winner, vs the best loser?)
-    // For simplicity in multiplayer, let's show ALL cards played in a row/grid.
+    const winnerId = currentRound.winner; // This round's winner (null if tie)
+    const categoryName = roundData.category; // Category stays same
+    const finalWinnerName = roundData.winnerName; // Game/Battle winner (for final display)
 
     return (
         <motion.div
@@ -62,76 +97,93 @@ const BattleOverlay = ({ roundData, myPlayerId, onComplete }) => {
         >
             <div className="battle-category">
                 Competition: <span>{categoryName}</span>
+                {history.length > 1 && <div style={{ fontSize: '0.6em', opacity: 0.8 }}>Round {roundIdx + 1} / {history.length}</div>}
             </div>
 
-            <div className="battle-arena">
-                {roundData.cardsPlayed.map((play, index) => {
-                    if (!play || !play.card) {
-                        console.warn("BattleOverlay: Invalid play object", play);
-                        return null;
-                    }
+            {/* We key the arena by roundIdx so framer motion treats it as new elements entering/leaving each round */}
+            <AnimatePresence mode='wait'>
+                {step !== 'exit' && (
+                    <div key={`arena-${roundIdx}`} className="battle-arena">
+                        {currentRound.cardsPlayed.map((play, index) => {
+                            if (!play || !play.card) return null;
 
-                    const isMe = play.playerId === myPlayerId;
-                    const isWinner = play.playerId === winnerId;
-                    const isFaceDown = !isMe && step === 'enter'; // Opponents face down initially
+                            const isMe = play.playerId === myPlayerId;
+                            const isRoundWinner = play.playerId === winnerId;
+                            // In a tie round, nobody is "winner" usually, or multiple are? 
+                            // Our logic sets winner=null for ties.
+                            const isFaceDown = !isMe && step === 'enter';
 
-                    const displayValue = play.card.values?.[categoryName] ?? play.card.attributes?.[categoryName] ?? '-';
+                            const displayValue = play.value ?? (play.card.values?.[categoryName] ?? play.card.attributes?.[categoryName] ?? '-');
 
-                    return (
-                        <div key={play.playerId} className={`battle-card-slot ${isWinner && step === 'compare' ? 'winner' : ''}`}>
-                            <div className="player-label">{play.playerName}</div>
+                            return (
+                                <div key={play.playerId} className={`battle-card-slot ${isRoundWinner && step === 'compare' ? 'winner' : ''}`}>
+                                    <div className="player-label">{play.playerName}</div>
 
-                            <motion.div
-                                initial={{ y: 100, opacity: 0 }}
-                                animate={{
-                                    y: 0,
-                                    opacity: 1,
-                                    scale: isWinner && step === 'compare' ? 1.1 : 1,
-                                    filter: (!isWinner && step === 'compare') ? 'grayscale(0.8) blur(1px)' : 'none'
-                                }}
-                                transition={{ delay: index * 0.1 }}
-                                className="battle-card-wrapper"
-                            >
-                                <div className={`flip-container ${!isFaceDown ? 'flipped' : ''}`}>
-                                    <div className="flipper">
-                                        <div className="front">
-                                            <Card
-                                                card={play.card}
-                                                categories={[{ name: categoryName }]} /* Only show relevant category? Or all? Let's show all for context but highlight one */
-                                                deckName={null}
-                                            />
-                                            {/* Highlight Overlay */}
-                                            {step === 'compare' && (
-                                                <motion.div
-                                                    className="stat-highlight"
-                                                    initial={{ opacity: 0, scale: 0.8 }}
-                                                    animate={{ opacity: 1, scale: 1 }}
-                                                >
-                                                    {displayValue}
-                                                </motion.div>
-                                            )}
-                                        </div>
-                                        <div className="back">
-                                            <Card faceDown={true} />
-                                        </div>
-                                    </div>
+                                    <motion.div
+                                        initial={{ y: 50, opacity: 0 }}
+                                        animate={{
+                                            y: 0,
+                                            opacity: 1,
+                                            scale: isRoundWinner && step === 'compare' ? 1.1 : 1,
+                                            filter: (!isRoundWinner && winnerId && step === 'compare') ? 'grayscale(0.8) blur(1px)' : 'none'
+                                        }}
+                                        exit={{ y: -50, opacity: 0 }}
+                                        transition={{ delay: index * 0.1 }}
+                                        className="battle-card-wrapper"
+                                    >
+                                        <Card
+                                            card={play.card}
+                                            categories={[{ name: categoryName }]}
+                                            deckName={null}
+                                            flipped={isFaceDown}
+                                            enableFlip={false} // Disable click interaction
+                                        />
+
+                                        {/* Highlight Overlay */}
+                                        {step === 'compare' && (
+                                            <motion.div
+                                                className="stat-highlight"
+                                                initial={{ opacity: 0, scale: 0.8 }}
+                                                animate={{ opacity: 1, scale: 1 }}
+                                            >
+                                                {displayValue}
+                                            </motion.div>
+                                        )}
+                                    </motion.div>
                                 </div>
-                            </motion.div>
-                        </div>
-                    );
-                })}
-            </div>
+                            );
+                        })}
+                    </div>
+                )}
+            </AnimatePresence>
 
-            {step === 'compare' && (
-                <motion.div
-                    className={`winner-banner ${!roundData.winnerName ? 'war-banner' : ''}`}
-                    initial={{ scale: 0, rotate: -10 }}
-                    animate={{ scale: 1, rotate: 0 }}
-                >
-                    {roundData.winnerName ? `${roundData.winnerName} Wins!` : 'WAR!'}
-                    {!roundData.winnerName && <div style={{ fontSize: '0.4em' }}>Cards added to Pot</div>}
-                </motion.div>
-            )}
+            {/* War Banner / Winner Banner */}
+            <AnimatePresence>
+                {step === 'compare' && showWarBanner && (
+                    <motion.div
+                        key="war-banner"
+                        className="winner-banner war-banner"
+                        initial={{ scale: 0, rotate: -10 }}
+                        animate={{ scale: 1, rotate: 0 }}
+                        exit={{ scale: 0, opacity: 0 }}
+                    >
+                        WAR!
+                        <div style={{ fontSize: '0.4em' }}>Tie - Next Cards!</div>
+                    </motion.div>
+                )}
+
+                {step === 'compare' && !showWarBanner && roundIdx === history.length - 1 && (
+                    <motion.div
+                        key="winner-banner"
+                        className="winner-banner"
+                        initial={{ scale: 0, rotate: -10 }}
+                        animate={{ scale: 1, rotate: 0 }}
+                        exit={{ scale: 0, opacity: 0 }}
+                    >
+                        {finalWinnerName ? `${finalWinnerName} Wins!` : 'DRAW!'}
+                    </motion.div>
+                )}
+            </AnimatePresence>
         </motion.div>
     );
 };

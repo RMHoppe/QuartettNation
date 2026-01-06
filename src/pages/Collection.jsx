@@ -1,11 +1,12 @@
 import React, { useEffect, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
-import { Trash2 } from 'lucide-react'
+import { Trash2, Share2 } from 'lucide-react'
 import { createGame } from '../services/game'
-import { getAllDecks, deleteDeck } from '../services/decks'
+import { getUserDecks, deleteDeck } from '../services/decks' // Use new getUserDecks
 import { Button, EmptyState } from '../ui'
 import DeckDetail from '../components/DeckDetail/DeckDetail'
 import { useHeader } from '../contexts/HeaderContext'
+import { useAuth } from '../contexts/AuthContext'
 import './Collection.css'
 
 const Collection = () => {
@@ -15,10 +16,13 @@ const Collection = () => {
     const navigate = useNavigate()
 
     const { setTitle, setBackTo } = useHeader()
+    const { user } = useAuth()
 
     useEffect(() => {
-        fetchDecks()
-    }, [])
+        if (user) {
+            fetchDecks()
+        }
+    }, [user])
 
     useEffect(() => {
         if (selectedDeckId) {
@@ -31,7 +35,7 @@ const Collection = () => {
 
     const fetchDecks = async () => {
         try {
-            const data = await getAllDecks()
+            const data = await getUserDecks(user.id)
             setDecks(data)
         } catch (err) {
             console.error('Error fetching decks:', err)
@@ -44,11 +48,11 @@ const Collection = () => {
         e.stopPropagation()
         if (window.confirm('Are you sure you want to delete this deck? This action cannot be undone.')) {
             try {
-                await deleteDeck(deckId)
+                await deleteDeck(deckId, user.id)
                 setDecks(prev => prev.filter(d => d.id !== deckId))
             } catch (err) {
                 console.error('Error deleting deck:', err)
-                alert('Failed to delete deck')
+                alert('Failed to delete deck: ' + err.message)
             }
         }
     }
@@ -57,21 +61,17 @@ const Collection = () => {
         return <DeckDetail deckId={selectedDeckId} onBack={() => setSelectedDeckId(null)} />
     }
 
-    return (
-        <div className="page-view app-card">
-            {/* Header handled by Layout */}
+    const ownedDecks = decks.filter(d => !d.isShared);
+    const sharedDecks = decks.filter(d => d.isShared);
 
-            {isLoading ? (
-                <div className="loading">Loading decks...</div>
-            ) : decks.length === 0 ? (
-                <EmptyState message="You haven't created any decks yet.">
-                    <Button variant="primary" onClick={() => window.location.href = '/create'} style={{ marginTop: '16px' }}>
-                        Create Deck
-                    </Button>
-                </EmptyState>
-            ) : (
-                <div className="modern-list">
-                    {decks.map(deck => (
+    const DeckList = ({ items, title }) => (
+        <div style={{ marginBottom: '2rem' }}>
+            <h3 style={{ marginBottom: '1rem', color: 'var(--text-dim)', textTransform: 'uppercase', fontSize: '0.9rem', letterSpacing: '0.05em' }}>{title}</h3>
+            <div className="modern-list">
+                {items.map(deck => {
+                    const isOwner = !deck.isShared;
+
+                    return (
                         <div key={deck.id} className="modern-list-item">
                             <div className="deck-info" onClick={() => setSelectedDeckId(deck.id)} style={{ cursor: 'pointer', flex: 1 }}>
                                 <h3>{deck.name}</h3>
@@ -81,23 +81,26 @@ const Collection = () => {
                                 <div className="deck-meta" style={{ display: 'flex', gap: '12px', fontSize: '0.8rem', color: 'var(--text-dim)' }}>
                                     <span>{deck.cards?.[0]?.count || 0} Cards</span>
                                     <span>{new Date(deck.created_at).toLocaleDateString()}</span>
+                                    {deck.isShared && <span style={{ color: 'var(--accent)', fontWeight: 'bold' }}>Shared</span>}
                                 </div>
                             </div>
                             <div className="deck-actions">
-                                <Button
-                                    variant="ghost" /* Redundant style but semantic */
-                                    size="sm"
-                                    onClick={(e) => handleDelete(e, deck.id)}
-                                    title="Delete Deck"
-                                    style={{ color: 'var(--danger)', marginRight: 'auto' }} /* Push to left or keep with buttons? Let's keep separate */
-                                >
-                                    <Trash2 size={16} />
-                                </Button>
+                                {isOwner && (
+                                    <Button
+                                        variant="ghost"
+                                        size="sm"
+                                        onClick={(e) => handleDelete(e, deck.id)}
+                                        title="Delete Deck"
+                                        style={{ color: 'var(--danger)' }}
+                                    >
+                                        <Trash2 size={16} />
+                                    </Button>
+                                )}
                                 <Button
                                     variant="secondary"
                                     size="sm"
                                     onClick={(e) => {
-                                        e.stopPropagation(); // Don't open detail view
+                                        e.stopPropagation();
                                         setSelectedDeckId(deck.id);
                                     }}
                                 >
@@ -109,13 +112,9 @@ const Collection = () => {
                                     onClick={async (e) => {
                                         e.stopPropagation();
                                         try {
-                                            let myId = sessionStorage.getItem('qn_player_id');
-                                            if (!myId) {
-                                                myId = crypto.randomUUID();
-                                                sessionStorage.setItem('qn_player_id', myId);
-                                            }
-
-                                            const game = await createGame(deck.id, myId, "Host");
+                                            // Pass real user ID to game creation
+                                            const baseName = user.user_metadata?.full_name || user.email?.split('@')[0] || "Player";
+                                            const game = await createGame(deck.id, user.id, `${baseName} (Host)`);
                                             navigate(`/game/${game.id}`);
                                         } catch (e) {
                                             console.error(e);
@@ -127,11 +126,29 @@ const Collection = () => {
                                 </Button>
                             </div>
                         </div>
-                    ))}
-                </div>
-            )
-            }
-        </div >
+                    );
+                })}
+            </div>
+        </div>
+    );
+
+    return (
+        <div className="page-view app-card">
+            {isLoading ? (
+                <div className="loading">Loading decks...</div>
+            ) : decks.length === 0 ? (
+                <EmptyState message="You haven't created any decks yet.">
+                    <Button variant="primary" onClick={() => navigate('/create')} style={{ marginTop: '16px' }}>
+                        Create Deck
+                    </Button>
+                </EmptyState>
+            ) : (
+                <>
+                    {ownedDecks.length > 0 && <DeckList items={ownedDecks} title="My Decks" />}
+                    {sharedDecks.length > 0 && <DeckList items={sharedDecks} title="Shared with Me" />}
+                </>
+            )}
+        </div>
     )
 }
 

@@ -1,16 +1,40 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { useParams } from 'react-router-dom';
 import { useGame } from '../hooks/useGame';
 import GameLobby from './GameLobby';
 import GameBoard from './GameBoard';
-import { Button } from '../ui';
+import { useAuth } from '../contexts/AuthContext';
+import { grantDeckAccess } from '../services/decks';
 import { useHeader } from '../contexts/HeaderContext';
+import { Button } from '../ui';
 
 const GameContainer = () => {
     const { id } = useParams();
     const { status, actions, gameState, myPlayer, isHost, players, deck, isMyTurn, error } = useGame(id);
     const [joinName, setJoinName] = useState('');
     const { setTitle, setBackTo } = useHeader();
+    const { user } = useAuth();
+    const joiningRef = useRef(false);
+
+    // Auto-share deck with logged in users
+    useEffect(() => {
+        if (user && deck?.id) {
+            grantDeckAccess(deck.id, user.id);
+        }
+    }, [user, deck?.id]);
+
+    // Auto-join for logged in users
+    useEffect(() => {
+        if (user && !myPlayer && status === 'lobby' && !joiningRef.current) {
+            joiningRef.current = true;
+            const name = user.user_metadata?.full_name || user.email?.split('@')[0] || "Player";
+            console.log("Auto-joining as", name);
+            actions.join(name).catch(e => {
+                console.error("Auto-join failed:", e);
+                joiningRef.current = false;
+            });
+        }
+    }, [user, myPlayer, status]);
 
     useEffect(() => {
         if (status === 'lobby') {

@@ -1,10 +1,11 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useCallback } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { useHeader } from '../contexts/HeaderContext'
 import DeckReview from '../components/DeckReview/DeckReview'
 import ModelSelector from '../components/ModelSelector'
 import { saveDeck } from '../services/decks'
 import { Button, Input } from '../ui'
+import { useAuth } from '../contexts/AuthContext'
 
 const CreateDeck = () => {
     const [themeInput, setThemeInput] = useState('')
@@ -15,7 +16,7 @@ const CreateDeck = () => {
     const [isEditing, setIsEditing] = useState(false)
 
     const navigate = useNavigate()
-
+    const { user } = useAuth()
     const { setTitle, setBackTo } = useHeader()
 
     // Reset header when entering initial state
@@ -27,15 +28,18 @@ const CreateDeck = () => {
     }, [isEditing])
 
 
-    const handleSaveDeck = async (finalDeck) => {
+    const handleSaveDeck = useCallback(async (finalDeck) => {
         try {
+            if (!user) throw new Error("You must be logged in to save a deck.");
+
             await saveDeck(
                 {
                     name: finalDeck.deckName,
                     theme: finalDeck.theme,
                     categories: finalDeck.categories
                 },
-                finalDeck.cards
+                finalDeck.cards,
+                user.id
             )
 
             alert('Deck saved successfully!');
@@ -47,7 +51,7 @@ const CreateDeck = () => {
             console.error('Error saving deck:', err);
             alert('Failed to save deck: ' + err.message);
         }
-    }
+    }, [user, navigate])
 
     const handleGenerate = async () => {
         if (!themeInput.trim()) return;
@@ -79,6 +83,11 @@ const CreateDeck = () => {
         }
     }
 
+    const handleCancel = useCallback(() => {
+        setIsEditing(false)
+        setGeneratedDeck(null)
+    }, [])
+
     return (
         <div className="page-view app-card">
             {/* Header handled by Layout */}
@@ -98,6 +107,7 @@ const CreateDeck = () => {
                         />
                     </div>
 
+                    {/* Size Selector and Generate Button remain same... */}
                     <div className="input-group">
                         <label>Number of Cards</label>
                         <div className="size-selector" style={{ display: 'flex', gap: '10px' }}>
@@ -138,13 +148,9 @@ const CreateDeck = () => {
                     theme={themeInput}
                     targetCount={deckSize}
                     onSave={handleSaveDeck}
-                    onCancel={() => {
-                        setIsEditing(false)
-                        setGeneratedDeck(null)
-                    }}
+                    onCancel={handleCancel}
                 />
             ) : (
-                // Should not reach here in new flow as we go straight to editing
                 null
             )}
         </div>

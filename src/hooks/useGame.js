@@ -2,11 +2,17 @@ import { useState, useEffect, useRef } from 'react';
 import { supabase } from '../lib/supabase';
 import { createGame, joinGame, subscribeToGame, updateGameState } from '../services/game';
 import { getDeckById } from '../services/decks';
+import { useAuth } from '../contexts/AuthContext';
 
 export function useGame(gameId) {
+    const { user } = useAuth();
+    const [guestId, setGuestId] = useState(sessionStorage.getItem('qn_player_id'));
+
+    // Prefer authenticated ID, fallback to guest ID
+    const playerId = user ? user.id : guestId;
+
     const [gameState, setGameState] = useState(null);
     const [status, setStatus] = useState('loading'); // loading, lobby, active, completed
-    const [playerId, setPlayerId] = useState(sessionStorage.getItem('qn_player_id'));
     const [error, setError] = useState(null);
     const [deckData, setDeckData] = useState(null);
 
@@ -16,17 +22,15 @@ export function useGame(gameId) {
     const isMyTurn = gameState?.turnPlayerId === playerId;
     const isWar = gameState?.warMode;
 
-    // Persist player ID
+    // Persist guest ID if needed
     useEffect(() => {
-        if (!playerId) {
+        if (!user && !guestId) {
             const newId = crypto.randomUUID();
-            console.log(`[useGame] Generated new Player ID: ${newId}`);
+            console.log(`[useGame] Generated new Guest ID: ${newId}`);
             sessionStorage.setItem('qn_player_id', newId);
-            setPlayerId(newId);
-        } else {
-            console.log(`[useGame] Using existing Player ID: ${playerId}`);
+            setGuestId(newId);
         }
-    }, []);
+    }, [user, guestId]);
 
     // Initial Load & Subscription
     useEffect(() => {
@@ -148,6 +152,21 @@ export function useGame(gameId) {
         }
     };
 
+    const concede = async () => {
+        if (!gameState || !myPlayer) return;
+
+        if (window.confirm("Are you sure you want to surrender? You will be eliminated from the game.")) {
+            const { concedePlayer } = await import('../utils/gameLogic');
+            try {
+                const newState = concedePlayer(gameState, myPlayer.id);
+                const status = newState.winner ? 'completed' : 'active';
+                await updateGameState(gameId, newState, status);
+            } catch (e) {
+                console.error("Concede Error:", e);
+            }
+        }
+    };
+
     return {
         gameState,
         status,
@@ -156,7 +175,7 @@ export function useGame(gameId) {
         isMyTurn,
         players: gameState?.players || [],
         deck: deckData,
-        actions: { join, start, playTurn },
+        actions: { join, start, playTurn, concede },
         error
     };
 }

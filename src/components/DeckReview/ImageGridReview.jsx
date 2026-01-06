@@ -1,75 +1,59 @@
 import React, { useState, useEffect } from 'react'
-import ImageStudio from './ImageStudio'
-import './ImageGridReview.css'
+import CardStudio from './CardStudio'
+import './CardGridReview.css'
+import Card from '../Card/Card'
+import { Button, Modal } from '../../ui'
+import { Pencil } from 'lucide-react'
 import { searchImages } from '../../services/wikimedia'
-import { Button, Modal, Spinner } from '../../ui'
 
-// Single card component with lazy image loading
-const LazyCard = ({ card, index, onClick, onImageLoaded }) => {
-    // Track if we are currently fetching to prevent duplicate requests
+// Lazily load image if missing, but render proper Card component
+const GridCardItem = ({ card, index, onEdit, onImageLoaded, categories, deckName }) => {
     const fetching = React.useRef(false)
-    // Keep onImageLoaded fresh without triggering effect
-    const onLoadedRef = React.useRef(onImageLoaded)
 
+    // Auto-fetch image if missing
     useEffect(() => {
-        onLoadedRef.current = onImageLoaded
-    }, [onImageLoaded])
-
-    useEffect(() => {
-        // If we already have an image, do nothing
         if (card.image_url) return
-
-        // If we are already fetching, do nothing
         if (fetching.current) return
+        if (!card.name) return
 
-        // Fetch using the card name
-        if (card.name) {
-            fetching.current = true
-
-            searchImages(card.name, 1) // Limit 1 is enough for initial load
-                .then(images => {
-                    if (images.length > 0) {
-                        // Update parent with image data
-                        onLoadedRef.current(index, {
-                            image_url: images[0].url,
-                            attribution_text: images[0].attribution,
-                            available_images: images
-                        })
-                    }
-                })
-                .catch(err => console.error('Image fetch error:', err))
-                .finally(() => {
-                    fetching.current = false
-                })
-        }
-    }, [card.image_url, card.name]) // Stable dependencies only
-
-    const hasImage = !!card.image_url
+        fetching.current = true
+        searchImages(card.name, 1)
+            .then(images => {
+                if (images.length > 0) {
+                    onImageLoaded(index, {
+                        image_url: images[0].url,
+                        attribution_text: images[0].attribution,
+                        available_images: images
+                    })
+                }
+            })
+            .catch(console.error)
+            .finally(() => fetching.current = false)
+    }, [card.image_url, card.name])
 
     return (
-        <div className="grid-card-item" onClick={() => onClick(index)}>
-            <div className={`img-wrapper ${!hasImage ? 'loading' : ''}`}>
-                {!hasImage ? (
-                    <div className="loading-placeholder">
-                        <Spinner size="sm" />
-                    </div>
-                ) : (
-                    <img src={card.image_url} alt={card.name} loading="lazy" />
-                )}
+        <div className="grid-card-wrapper" onClick={() => onEdit(index)}>
+            <Card
+                card={card}
+                categories={categories}
+                deckName={deckName}
+                compact={false}
+            // We disable internal interactions if any, view only
+            />
+            <div className="card-edit-btn" aria-label="Edit Card">
+                <Pencil size={16} />
             </div>
-            <span className="card-name">{card.name}</span>
         </div>
     )
 }
 
-const ImageGridReview = ({ deck, updateDeck, onSave }) => {
+const CardGridReview = ({ deck, updateDeck, onSave }) => {
     const [selectedCardIndex, setSelectedCardIndex] = useState(null)
 
-    const handleCardClick = (index) => {
+    const handleEditClick = (index) => {
         setSelectedCardIndex(index)
     }
 
-    // Update a single card when image is lazy-loaded
     const handleImageLoaded = (index, imageData) => {
         const updatedCards = [...deck.cards]
         updatedCards[index] = { ...updatedCards[index], ...imageData }
@@ -80,19 +64,18 @@ const ImageGridReview = ({ deck, updateDeck, onSave }) => {
         setSelectedCardIndex(null)
     }
 
-    // If a card is selected, show the Studio Mode
-    // We render Modal conditionally to keep clean hierarchy
     return (
         <>
             <Modal
                 open={selectedCardIndex !== null}
                 onClose={() => setSelectedCardIndex(null)}
-                title="Edit Card Image"
+                title={selectedCardIndex !== null ? `Edit Card (${selectedCardIndex + 1}/${deck.cards.length})` : 'Edit Card'}
             >
                 {selectedCardIndex !== null && (
-                    <ImageStudio
+                    <CardStudio
                         deck={deck}
-                        startAtIndex={selectedCardIndex}
+                        currentIndex={selectedCardIndex}
+                        onNavigate={setSelectedCardIndex}
                         updateDeck={updateDeck}
                         onSave={handleStudioSave}
                         isModal={true}
@@ -101,16 +84,18 @@ const ImageGridReview = ({ deck, updateDeck, onSave }) => {
             </Modal>
 
             <div className="image-grid-review">
-                <p className="hint-text">Tap any card to adjust its image. Click 'Finish Deck' when done.</p>
+                <p className="hint-text">Review your cards. Click the pen icon to edit images or stats.</p>
 
                 <div className="modern-grid dense">
                     {deck.cards.map((card, idx) => (
-                        <LazyCard
+                        <GridCardItem
                             key={idx}
                             card={card}
                             index={idx}
-                            onClick={handleCardClick}
+                            onEdit={handleEditClick}
                             onImageLoaded={handleImageLoaded}
+                            categories={deck.categories}
+                            deckName={deck.theme} // or deck.deckName
                         />
                     ))}
                 </div>
@@ -125,4 +110,4 @@ const ImageGridReview = ({ deck, updateDeck, onSave }) => {
     )
 }
 
-export default ImageGridReview
+export default CardGridReview

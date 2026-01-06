@@ -31,7 +31,14 @@ const GameBoard = ({ matchId, gameState, myPlayer, deck, actions, isMyTurn }) =>
         }
     }, [lastRound]);
 
-    if (gameState.status === 'completed' && winner) {
+
+
+    // If I am eliminated, we don't return early anymore.
+    // Instead we obscure the controls.
+    const isEliminated = myPlayer.eliminated;
+
+    // Only show Game Over if we are done AND not currently watching the final battle
+    if (gameState.status === 'completed' && winner && !showBattle) {
         return (
             <div className="game-board-container game-over">
                 <h1>Game Over!</h1>
@@ -40,10 +47,6 @@ const GameBoard = ({ matchId, gameState, myPlayer, deck, actions, isMyTurn }) =>
             </div>
         );
     }
-
-    // If I am eliminated, we don't return early anymore.
-    // Instead we obscure the controls.
-    const isEliminated = myPlayer.eliminated;
 
     return (
         <div className="game-board-container">
@@ -83,6 +86,15 @@ const GameBoard = ({ matchId, gameState, myPlayer, deck, actions, isMyTurn }) =>
 
             {/* Main Play Area */}
             <div className="main-play-area">
+                {/* My Stats / Avatar */}
+                <div className="my-player-info" style={{ display: 'flex', gap: '1rem', alignItems: 'center', marginBottom: '1rem', justifyContent: 'center' }}>
+                    <div className="opponent-avatar" style={{ background: '#4CAF50' }}>👤</div>
+                    <div className="my-info-text" style={{ textAlign: 'left' }}>
+                        <div style={{ fontWeight: 'bold' }}>{myPlayer.name} (You)</div>
+                        <div style={{ fontSize: '0.9em', opacity: 0.8 }}>{myPlayer.hand.length} cards</div>
+                    </div>
+                </div>
+
                 {/* My Card */}
                 <div className="my-card-section">
                     {currentCard ? (
@@ -114,16 +126,36 @@ const GameBoard = ({ matchId, gameState, myPlayer, deck, actions, isMyTurn }) =>
                         </div>
                     )}
 
+
+
                     {!isEliminated && !isMyTurn && (
                         <div className="waiting-message">
                             Waiting for opponent...
                         </div>
                     )}
 
-                    {!isEliminated && isWar && isMyTurn && (
-                        <div className="war-alert">
-                            <h3>WAR!</h3>
-                            <p>Tie detected. Select category to break tie (must be same usually, but you have choice).</p>
+                    {lastRound && !showBattle && (
+                        <div className="review-battle-container" style={{ marginTop: '1rem', textAlign: 'center' }}>
+                            <Button
+                                variant="secondary"
+                                size="sm"
+                                onClick={() => setShowBattle(true)}
+                            >
+                                Review Last Battle
+                            </Button>
+                        </div>
+                    )}
+
+                    {!isEliminated && !winner && (
+                        <div style={{ marginTop: '2rem', textAlign: 'center' }}>
+                            <Button
+                                variant="ghost"
+                                size="sm"
+                                onClick={actions.concede}
+                                style={{ color: 'var(--danger)', opacity: 0.7 }}
+                            >
+                                Surrender Game
+                            </Button>
                         </div>
                     )}
                 </div>

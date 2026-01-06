@@ -2,12 +2,25 @@ import React from 'react'
 import CardBack from './CardBack'
 import './Card.css'
 
-const Card = ({ card, categories, compact = false, onCategorySelect, isSelectable = false, deckName, faceDown = false }) => {
-    if (faceDown) return <div className={`card-container ${compact ? 'compact' : ''}`}><CardBack /></div>
-    if (!card) return null
+const Card = ({ card, categories, compact = false, onCategorySelect, isSelectable = false, deckName, faceDown = false, enableFlip = false, flipped = null }) => {
+    const [internalFlipped, setInternalFlipped] = React.useState(false);
 
-    return (
-        <div className={`card-container ${compact ? 'compact' : ''}`}>
+    // Controlled vs Uncontrolled logic
+    const isFlipped = flipped !== null ? flipped : internalFlipped;
+
+    // If strictly faceDown (static back), just show back.
+    if (faceDown && !enableFlip && flipped === null) return <div className={`card-scene ${compact ? 'compact' : ''}`}><div className="card-face card-back" style={{ position: 'relative', transform: 'none' }}><CardBack /></div></div>;
+    if (!card) return null;
+
+    const handleFlip = () => {
+        if (enableFlip && flipped === null) {
+            setInternalFlipped(!internalFlipped);
+        }
+    };
+
+    // The front content (originally the whole component)
+    const CardFrontContent = (
+        <>
             <div className="card-top-section">
                 {deckName && <div className="deck-name">{deckName}</div>}
                 <h3 className="card-name">{card.name}</h3>
@@ -15,20 +28,12 @@ const Card = ({ card, categories, compact = false, onCategorySelect, isSelectabl
 
             <div className="card-image-wrapper">
                 <img
-                    src={card.image_url || 'https://via.placeholder.com/512?text=No+Image'}
+                    src={card.image_url || "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='512' height='512' viewBox='0 0 512 512'%3E%3Crect width='512' height='512' fill='%231f2937'/%3E%3Ctext x='50%25' y='50%25' font-family='sans-serif' font-size='48' fill='%236b7280' text-anchor='middle' dy='.3em'%3ENo Image%3C/text%3E%3C/svg%3E"}
                     alt={card.name}
                     className="card-image"
                     style={card.image_settings ? {
-                        transform: `scale(${card.image_settings.scale}) translate(${card.image_settings.x / card.image_settings.scale}px, ${card.image_settings.y / card.image_settings.scale}px)`,
-                        transformOrigin: 'center',
-                        // We need to ensure object-fit doesn't fight us, usually cover is fine but we are transforming the element itself.
-                        // However, transforming an object-fit: cover element can be tricky.
-                        // Better approach: object-fit: cover + transform usually crops "more".
-                        // Let's rely on the studio matching the card's visual.
-                        // NOTE: Studio uses translate(x,y) then scale(s). CSS transform order matters.
-                        // Studio: transform: `translate(${position.x}px, ${position.y}px) scale(${position.scale})`
-                        // So we should match that exactly.
-                        transform: `translate(${card.image_settings.x}px, ${card.image_settings.y}px) scale(${card.image_settings.scale})`
+                        transform: `translate(${card.image_settings.x}px, ${card.image_settings.y}px) scale(${card.image_settings.scale})`,
+                        transformOrigin: 'center'
                     } : {}}
                 />
                 <div className="card-attribution">
@@ -39,8 +44,6 @@ const Card = ({ card, categories, compact = false, onCategorySelect, isSelectabl
             <div className="card-content">
                 <div className="card-stats">
                     {categories.map((cat, idx) => {
-                        // Parse "Name [Unit]" -> label="Name", unit="Unit"
-                        // Or utilize existing cat.unit if present (legacy support)
                         let label = cat.name;
                         let unit = cat.unit;
 
@@ -52,15 +55,19 @@ const Card = ({ card, categories, compact = false, onCategorySelect, isSelectabl
                             }
                         }
 
-                        // Also handle value access using the FULL category name as key, 
-                        // because that's how it's stored in the DB/object now.
                         const value = card.values ? card.values[cat.name] : (card.attributes ? card.attributes[cat.name] : '-');
 
                         return (
                             <div
                                 key={idx}
                                 className={`stat-row ${isSelectable ? 'selectable' : ''}`}
-                                onClick={() => isSelectable && onCategorySelect && onCategorySelect(cat.name)}
+                                onClick={(e) => {
+                                    if (isFlipped) return; // No interaction if flipped
+                                    if (isSelectable && onCategorySelect) {
+                                        e.stopPropagation(); // Don't flip if selecting category
+                                        onCategorySelect(cat.name);
+                                    }
+                                }}
                             >
                                 <span className="stat-label">{label}</span>
                                 <span className="stat-value">
@@ -72,8 +79,24 @@ const Card = ({ card, categories, compact = false, onCategorySelect, isSelectabl
                     })}
                 </div>
             </div>
+        </>
+    );
+
+    return (
+        <div
+            className={`card-scene ${compact ? 'compact' : ''} ${enableFlip ? 'clickable' : ''}`}
+            onClick={enableFlip ? handleFlip : undefined}
+        >
+            <div className={`card-inner ${isFlipped ? 'is-flipped' : ''}`}>
+                <div className="card-face card-front">
+                    {CardFrontContent}
+                </div>
+                <div className="card-face card-back">
+                    <CardBack />
+                </div>
+            </div>
         </div>
-    )
+    );
 }
 
 export default Card

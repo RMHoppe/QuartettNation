@@ -1,7 +1,42 @@
-.card-container {
+/* The root container defines size and perspective */
+.card-scene {
     width: var(--card-width);
     max-width: var(--card-max-width);
     aspect-ratio: var(--card-aspect);
+    perspective: 1000px;
+    position: relative;
+    cursor: default;
+    /* Default, overridden if clickable */
+}
+
+.card-scene.clickable {
+    cursor: pointer;
+}
+
+/* The inner wrapper handles the 3D rotation */
+.card-inner {
+    width: 100%;
+    height: 100%;
+    position: relative;
+    transition: transform 0.6s cubic-bezier(0.4, 0.0, 0.2, 1);
+    transform-style: preserve-3d;
+}
+
+.card-inner.is-flipped {
+    transform: rotateY(180deg);
+}
+
+/* Shared styles for both faces */
+.card-face {
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    top: 0;
+    left: 0;
+    -webkit-backface-visibility: hidden;
+    backface-visibility: hidden;
+
+    /* Visuals from original .card-container */
     background: var(--surface);
     border-radius: var(--radius-lg);
     overflow: hidden;
@@ -9,7 +44,26 @@
     border: 1px solid var(--glass-border);
     display: flex;
     flex-direction: column;
-    position: relative;
+}
+
+/* Front Face (Default) */
+.card-front {
+    /* z-index: 2; not strictly needed with preserve-3d usually, but safer */
+    z-index: 2;
+    transform: rotateY(0deg);
+}
+
+/* Back Face */
+.card-back {
+    transform: rotateY(180deg);
+}
+
+/* Legacy support map to new structure if needed, or just use new classes in JSX */
+.card-container {
+    /* Kept for backward compat if I miss an update, but ideally unused acting as face */
+    width: 100%;
+    height: 100%;
+    /* ... visuals ... */
 }
 
 .card-image-wrapper {

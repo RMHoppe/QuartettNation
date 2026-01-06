@@ -1,0 +1,121 @@
+.card-studio {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    gap: var(--spacing-md);
+    overflow: hidden;
+    max-width: 600px;
+    margin: 0 auto;
+    /* Center everything */
+    width: 100%;
+}
+
+.studio-header {
+    text-align: center;
+    flex-shrink: 0;
+}
+
+.studio-hint {
+    font-size: 0.8rem;
+    color: var(--text-dim);
+    margin-top: 4px;
+}
+
+/* 
+   Main Stage: Center the card.
+*/
+.studio-stage {
+    flex: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: relative;
+    overflow: hidden;
+    padding: var(--spacing-md);
+}
+
+/* 
+   We wrap the card-scene in a frame to force a specific size for the editor 
+   and provide a background/shadow distinct from the standard card.
+*/
+.studio-card-frame {
+    /* Force size for editing comfort */
+    width: 320px !important;
+    max-width: 100%;
+    aspect-ratio: 2/3;
+
+    /* override some card-scene defaults if needed, 
+       but mostly we rely on Card.css classes inside */
+    position: relative;
+    box-shadow: 0 0 40px rgba(0, 0, 0, 0.6);
+}
+
+/* Interactive Image Wrapper */
+.studio-interactive-image {
+    cursor: grab;
+    /* Ensure it clips the image */
+    overflow: hidden;
+    /* Force height/layout if Card.css vars aren't perfectly set for this context */
+    /* .card-image-wrapper already has aspect-ratio: 1/1 */
+}
+
+.studio-interactive-image:active {
+    cursor: grabbing;
+}
+
+/* 
+   The draggable image itself 
+   (Actually handled by inline styles in JSX now, but ensuring touch-action) 
+*/
+.studio-interactive-image img {
+    touch-action: none;
+}
+
+/* Stats Editing Overrides */
+.studio-stat-input {
+    background: transparent;
+    border: none;
+    border-bottom: 2px solid transparent;
+    color: var(--text);
+    font-weight: 700;
+    font-size: 1rem;
+    text-align: right;
+    width: 80px;
+    padding: 0 4px;
+    /* Tight padding to match text */
+    transition: all 0.2s;
+    font-family: inherit;
+}
+
+.studio-stat-input:focus {
+    outline: none;
+    border-bottom-color: var(--primary);
+    background: rgba(255, 255, 255, 0.05);
+}
+
+/* Controls Below Card */
+.studio-controls {
+    padding: var(--spacing-md);
+    background: var(--surface);
+    border-top: 1px solid var(--glass-border);
+    flex-shrink: 0;
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-md);
+}
+
+/* Reuse existing thumbnail styles */
+.thumbnails img {
+    width: 50px;
+    height: 50px;
+}
+
+/* Navigation Buttons */
+.studio-nav {
+    display: flex;
+    justify-content: center;
+    /* Centered Navigation */
+    align-items: center;
+    padding: var(--spacing-sm);
+    border-top: 1px solid var(--glass-border);
+}

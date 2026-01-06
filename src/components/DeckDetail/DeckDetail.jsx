@@ -61,6 +61,7 @@ const DeckDetail = ({ deckId, onBack }) => {
                             card={card}
                             categories={deck.categories}
                             deckName={deck.name}
+                            enableFlip={true}
                         />
                     ))}
                 </div>
