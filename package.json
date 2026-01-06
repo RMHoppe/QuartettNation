@@ -2,7 +2,7 @@
   "name": "quartettnation",
   "private": true,
   "version": "0.0.0",
-  "homepage": "https://<YOUR_GITHUB_USERNAME>.github.io/<YOUR_REPO_NAME>",
+  "homepage": "https://rmhoppe.github.io/QuartettNation",
   "type": "module",
   "scripts": {
     "dev": "vite",
