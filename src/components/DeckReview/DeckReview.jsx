@@ -42,6 +42,14 @@ const DeckReview = ({ initialPartialDeck, onSave, onCancel, theme, targetCount =
         setDeck(prev => ({ ...prev, ...updates }))
     }
 
+    const updateCard = (index, cardUpdates) => {
+        setDeck(prev => {
+            const newCards = [...prev.cards]
+            newCards[index] = { ...newCards[index], ...cardUpdates }
+            return { ...prev, cards: newCards }
+        })
+    }
+
     // Transitions
     const handleCategoriesConfirmed = async () => {
         setIsLoading(true)
@@ -103,7 +111,7 @@ const DeckReview = ({ initialPartialDeck, onSave, onCancel, theme, targetCount =
                     <CardNameReview deck={deck} updateDeck={updateDeck} onNext={handleNamesConfirmed} />
                 )}
                 {step === 3 && (
-                    <ImageGridReview deck={deck} updateDeck={updateDeck} onSave={() => onSave(deck)} />
+                    <ImageGridReview deck={deck} updateDeck={updateDeck} updateCard={updateCard} onSave={() => onSave(deck)} />
                 )}
             </div>
         </div>

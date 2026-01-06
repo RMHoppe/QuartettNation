@@ -22,8 +22,7 @@ const GridCardItem = ({ card, index, onEdit, onImageLoaded, categories, deckName
                 if (images.length > 0) {
                     onImageLoaded(index, {
                         image_url: images[0].url,
-                        attribution_text: images[0].attribution,
-                        available_images: images
+                        attribution_text: images[0].attribution
                     })
                 }
             })
@@ -47,7 +46,7 @@ const GridCardItem = ({ card, index, onEdit, onImageLoaded, categories, deckName
     )
 }
 
-const CardGridReview = ({ deck, updateDeck, onSave }) => {
+const CardGridReview = ({ deck, updateDeck, updateCard, onSave }) => {
     const [selectedCardIndex, setSelectedCardIndex] = useState(null)
 
     const handleEditClick = (index) => {
@@ -55,9 +54,7 @@ const CardGridReview = ({ deck, updateDeck, onSave }) => {
     }
 
     const handleImageLoaded = (index, imageData) => {
-        const updatedCards = [...deck.cards]
-        updatedCards[index] = { ...updatedCards[index], ...imageData }
-        updateDeck({ cards: updatedCards })
+        updateCard(index, imageData)
     }
 
     const handleStudioSave = () => {

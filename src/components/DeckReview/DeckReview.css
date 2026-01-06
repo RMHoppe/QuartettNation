@@ -1,18 +1,8 @@
 .deck-review-container {
     display: flex;
     flex-direction: column;
-    height: 100vh;
-    background: var(--background);
-    position: fixed;
-    top: 0;
-    left: 50%;
-    transform: translateX(-50%);
     width: 100%;
-    max-width: 600px;
-    z-index: 50;
-    overflow: hidden;
-    box-shadow: 0 0 50px rgba(0, 0, 0, 0.5);
-    /* Shadow to separate from potential empty space on wide screens */
+    /* Removed fixed positioning to respect Layout footer */
 }
 
 .review-header {
@@ -39,9 +29,8 @@
 
 .review-content {
     flex: 1;
-    overflow-y: auto;
+    /* Removed internal overflow to allow app-main to scroll */
     padding: var(--spacing-md);
-    max-width: 600px;
     width: 100%;
     margin: 0 auto;
 }

@@ -2,7 +2,7 @@ import React, { useState, useEffect, useCallback } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { useHeader } from '../contexts/HeaderContext'
 import DeckReview from '../components/DeckReview/DeckReview'
-import ModelSelector from '../components/ModelSelector'
+// import ModelSelector from '../components/ModelSelector'
 import { saveDeck } from '../services/decks'
 import { Button, Input } from '../ui'
 import { useAuth } from '../contexts/AuthContext'
@@ -95,7 +95,7 @@ const CreateDeck = () => {
 
             {!generatedDeck ? (
                 <>
-                    <ModelSelector />
+                    {/* ModelSelector removed per request */}
 
                     <div className="input-group">
                         <Input
