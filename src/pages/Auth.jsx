@@ -6,6 +6,7 @@ import '../index.css' // Ensure global styles
 
 const Auth = () => {
     const [email, setEmail] = useState('')
+    const [username, setUsername] = useState('')
     const [password, setPassword] = useState('')
     const [loading, setLoading] = useState(false)
     const [isSignUp, setIsSignUp] = useState(false)
@@ -22,6 +23,11 @@ const Auth = () => {
                 const { error } = await supabase.auth.signUp({
                     email,
                     password,
+                    options: {
+                        data: {
+                            full_name: username,
+                        },
+                    },
                 })
                 if (error) throw error
                 // Usually Supabase requires email confirmation, but for now we assume it might be off or we handle "check email"
@@ -63,6 +69,18 @@ const Auth = () => {
                 )}
 
                 <form onSubmit={handleAuth} className="input-group" style={{ gap: '1.5rem' }}>
+                    {isSignUp && (
+                        <div className="input-group">
+                            <label>Username</label>
+                            <Input
+                                type="text"
+                                value={username}
+                                onChange={(e) => setUsername(e.target.value)}
+                                required
+                                placeholder="Choose a username"
+                            />
+                        </div>
+                    )}
                     <div className="input-group">
                         <label>Email</label>
                         <Input
