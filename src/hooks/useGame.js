@@ -3,6 +3,7 @@ import { supabase } from '../lib/supabase';
 import { createGame, joinGame, subscribeToGame, updateGameState } from '../services/game';
 import { getDeckById } from '../services/decks';
 import { useAuth } from '../contexts/AuthContext';
+import { initializeGame, resolveRound, concedePlayer } from '../utils/gameLogic';
 
 export function useGame(gameId) {
     const { user } = useAuth();
@@ -78,8 +79,6 @@ export function useGame(gameId) {
 
     // --- ACTIONS ---
 
-    // --- ACTIONS ---
-
     const join = async (playerName) => {
         if (!gameId || !playerId) {
             console.error("[useGame] Join aborted: Missing gameId or playerId", { gameId, playerId });
@@ -124,7 +123,6 @@ export function useGame(gameId) {
     const start = async () => {
         if (!isHost || !deckData) return;
 
-        const { initializeGame } = await import('../utils/gameLogic');
         const initialGameState = initializeGame(gameState.players, deckData.cards);
 
         const newState = {
@@ -137,9 +135,6 @@ export function useGame(gameId) {
 
     const playTurn = async (categoryName) => {
         if (!isMyTurn) return;
-
-        // Import logic dynamic or static
-        const { resolveRound } = await import('../utils/gameLogic');
 
         try {
             const newState = resolveRound(gameState, deckData, categoryName);
@@ -156,7 +151,6 @@ export function useGame(gameId) {
         if (!gameState || !myPlayer) return;
 
         if (window.confirm("Are you sure you want to surrender? You will be eliminated from the game.")) {
-            const { concedePlayer } = await import('../utils/gameLogic');
             try {
                 const newState = concedePlayer(gameState, myPlayer.id);
                 const status = newState.winner ? 'completed' : 'active';
