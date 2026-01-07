@@ -14,6 +14,7 @@ const ImageStudio = ({ deck, updateDeck, onSave, startAtIndex = 0, isModal = fal
 
     const currentCard = deck.cards[currentCardIndex]
     const imageRef = useRef(null)
+    const wrapperRef = useRef(null)
 
     // Load alternatives when card changes
     useEffect(() => {
@@ -70,12 +71,23 @@ const ImageStudio = ({ deck, updateDeck, onSave, startAtIndex = 0, isModal = fal
         e.target.releasePointerCapture(e.pointerId);
     }
 
-    const handleWheel = (e) => {
-        // Simple zoom
-        const delta = e.deltaY * -0.001;
-        const newScale = Math.min(Math.max(0.5, position.scale + delta), 3);
-        setPosition(prev => ({ ...prev, scale: newScale }));
-    }
+    // Native wheel listener to support passive: false
+    useEffect(() => {
+        const wrapper = wrapperRef.current
+        if (!wrapper) return
+
+        const handleWheelNative = (e) => {
+            e.preventDefault()
+            const delta = e.deltaY * -0.001
+            setPosition(prev => {
+                const newScale = Math.min(Math.max(0.5, prev.scale + delta), 3)
+                return { ...prev, scale: newScale }
+            })
+        }
+
+        wrapper.addEventListener('wheel', handleWheelNative, { passive: false })
+        return () => wrapper.removeEventListener('wheel', handleWheelNative)
+    }, [])
 
     // Helper to save current crop settings to the deck state
     const saveCropSettings = () => {
@@ -120,7 +132,7 @@ const ImageStudio = ({ deck, updateDeck, onSave, startAtIndex = 0, isModal = fal
             <div className="cropper-stage">
                 <div className="cropper-mask">
                     <img
-                        ref={imageRef}
+                        ref={wrapperRef}
                         src={currentCard.image_url}
                         alt="Card Subject"
                         style={{
@@ -130,7 +142,6 @@ const ImageStudio = ({ deck, updateDeck, onSave, startAtIndex = 0, isModal = fal
                         onPointerDown={handlePointerDown}
                         onPointerMove={handlePointerMove}
                         onPointerUp={handlePointerUp}
-                        onWheel={handleWheel}
                         draggable={false}
                     />
                 </div>

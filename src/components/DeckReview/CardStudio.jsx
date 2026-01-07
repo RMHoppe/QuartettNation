@@ -17,6 +17,7 @@ const CardStudio = ({ deck, updateDeck, onSave, currentIndex = 0, onNavigate, is
     const [hasChanges, setHasChanges] = useState(false);
 
     const imageRef = useRef(null)
+    const wrapperRef = useRef(null)
 
     const prevIndexRef = useRef(currentIndex);
 
@@ -105,12 +106,24 @@ const CardStudio = ({ deck, updateDeck, onSave, currentIndex = 0, onNavigate, is
         e.target.releasePointerCapture(e.pointerId);
     }
 
-    const handleWheel = (e) => {
-        const delta = e.deltaY * -0.001;
-        const newScale = Math.min(Math.max(0.5, position.scale + delta), 3);
-        setPosition(prev => ({ ...prev, scale: newScale }));
-        setHasChanges(true);
-    }
+    // Native wheel listener to support passive: false (required to preventDefault wheel scroll)
+    useEffect(() => {
+        const wrapper = wrapperRef.current
+        if (!wrapper) return
+
+        const handleWheelNative = (e) => {
+            e.preventDefault()
+            const delta = e.deltaY * -0.001
+            setPosition(prev => {
+                const newScale = Math.min(Math.max(0.5, prev.scale + delta), 3)
+                return { ...prev, scale: newScale }
+            })
+            setHasChanges(true)
+        }
+
+        wrapper.addEventListener('wheel', handleWheelNative, { passive: false })
+        return () => wrapper.removeEventListener('wheel', handleWheelNative)
+    }, []) // Setters are stable
 
     // -- State Updates --
     const selectAlternative = (img) => {
@@ -177,11 +190,11 @@ const CardStudio = ({ deck, updateDeck, onSave, currentIndex = 0, onNavigate, is
 
                             {/* 2. Image Area (Interactive) */}
                             <div
+                                ref={wrapperRef}
                                 className="card-image-wrapper studio-interactive-image"
                                 onPointerDown={handlePointerDown}
                                 onPointerMove={handlePointerMove}
                                 onPointerUp={handlePointerUp}
-                                onWheel={handleWheel}
                                 style={{ cursor: isDragging ? 'grabbing' : 'grab' }}
                             >
                                 <img

@@ -1,5 +1,4 @@
 .image-grid-review {
-    /* Legacy class name support or rename */
     height: 100%;
     display: flex;
     flex-direction: column;
@@ -20,14 +19,14 @@
 /* Edit Overlay Button */
 .card-edit-btn {
     position: absolute;
-    top: 8px;
-    right: 8px;
-    width: 32px;
-    height: 32px;
+    top: -12px;
+    right: -12px;
+    width: 36px;
+    height: 36px;
     border-radius: 50%;
     background: var(--primary);
     color: white;
-    border: 2px solid rgba(255, 255, 255, 0.2);
+    border: 2px solid var(--surface);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -41,39 +40,20 @@
 .card-edit-btn:hover {
     transform: scale(1.1);
     background: var(--primary-hover, #4f46e5);
-    /* Fallback */
 }
 
-/* Ensure the card wrapper allows absolute positioning on top */
-.grid-card-wrapper {
+/* New Wrapper */
+.review-card-wrapper {
     position: relative;
-    cursor: pointer;
+    /* Ensure it takes space but doesn't force aspect ratio weirdly */
     width: 100%;
-    aspect-ratio: 2/3;
-    /* Reserve space */
     display: flex;
     justify-content: center;
-    align-items: center;
 }
 
-/* Force the internal card to scale to fit */
-.grid-card-wrapper .card-scene {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%) scale(0.65);
-    /* Scale down to fit grid slot */
-    transform-origin: center;
-    pointer-events: none;
-    /* Let clicks pass to wrapper */
+.review-card-wrapper:hover .card-edit-btn {
+    transform: scale(1.1) rotate(15deg);
 }
 
-/* Optional hover effect on card to hint interactivity */
-.grid-card-wrapper:hover {
-    transform: translateY(-4px);
-    transition: transform 0.2s ease;
-}
-
-.grid-card-wrapper:hover .card-edit-btn {
-    transform: scale(1.1);
-}
+/* Ensure the card scene behaves well inside */
+/* .review-card-wrapper .card-scene { } - No overrides needed */

@@ -98,7 +98,7 @@ Top Speed [km/h], Weight [kg], Power [hp], 0-100 Time [s]
 // STEP 2: Card Names
 export async function generateCardNames(theme, categories, count = 32) {
     const prompt = `
-Task: Generate exactly ${count} unique names of ${theme}.
+Task: Generate exactly ${count} unique entries in a list of ${theme}.
 Return a simple line-break separated list. No explanation.
 
 Example:

@@ -7,15 +7,13 @@ import CategoryReview from './CategoryReview'
 import CardNameReview from './CardNameReview'
 import ImageGridReview from './ImageGridReview'
 
+import { generateCardNames, generateCardDetails } from '../../services/gemini'
+
 const DeckReview = ({ initialPartialDeck, onSave, onCancel, theme, targetCount = 32 }) => {
     const [step, setStep] = useState(1)
     const [deck, setDeck] = useState(initialPartialDeck)
     const [isLoading, setIsLoading] = useState(false)
     const [loadingMsg, setLoadingMsg] = useState('')
-
-    // Dynamically imported to avoid cyclic dependencies if any
-    // But ideally passed from App.jsx or imported here.
-    // We'll import them at top level for now.
 
     // Global Header Management
     // We update this whenever step or deck changes slightly
@@ -55,7 +53,6 @@ const DeckReview = ({ initialPartialDeck, onSave, onCancel, theme, targetCount =
         setIsLoading(true)
         setLoadingMsg('Generating Card Names...')
         try {
-            const { generateCardNames } = await import('../../services/gemini')
             const data = await generateCardNames(theme, deck.categories, targetCount)
             // Initialize cards with names only
             const cards = data.cardNames.map((name, i) => ({ index: i + 1, name, values: {} }))
@@ -72,8 +69,6 @@ const DeckReview = ({ initialPartialDeck, onSave, onCancel, theme, targetCount =
         setIsLoading(true)
         setLoadingMsg('Generating Stats...')
         try {
-            const { generateCardDetails } = await import('../../services/gemini')
-
             // Get Details (Stats + Search Queries) - NO image fetching here
             const detailsData = await generateCardDetails(theme, deck.categories, deck.cards.map(c => c.name))
 

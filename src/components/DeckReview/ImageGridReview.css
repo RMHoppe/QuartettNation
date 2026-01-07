@@ -11,8 +11,6 @@
     margin-bottom: var(--spacing-md);
 }
 
-/* cards-grid replaced by .modern-grid.dense */
-
 .grid-card-item {
     display: flex;
     flex-direction: column;

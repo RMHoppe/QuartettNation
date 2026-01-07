@@ -31,17 +31,24 @@ const GridCardItem = ({ card, index, onEdit, onImageLoaded, categories, deckName
     }, [card.image_url, card.name])
 
     return (
-        <div className="grid-card-wrapper" onClick={() => onEdit(index)}>
+        <div className="review-card-wrapper">
             <Card
                 card={card}
                 categories={categories}
                 deckName={deckName}
                 compact={false}
-            // We disable internal interactions if any, view only
+                enableFlip={true}
             />
-            <div className="card-edit-btn" aria-label="Edit Card">
+            <button
+                className="card-edit-btn"
+                aria-label="Edit Card"
+                onClick={(e) => {
+                    e.stopPropagation()
+                    onEdit(index)
+                }}
+            >
                 <Pencil size={16} />
-            </div>
+            </button>
         </div>
     )
 }
@@ -83,7 +90,7 @@ const CardGridReview = ({ deck, updateDeck, updateCard, onSave }) => {
             <div className="image-grid-review">
                 <p className="hint-text">Review your cards. Click the pen icon to edit images or stats.</p>
 
-                <div className="modern-grid dense">
+                <div className="modern-grid">
                     {deck.cards.map((card, idx) => (
                         <GridCardItem
                             key={idx}

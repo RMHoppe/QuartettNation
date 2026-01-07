@@ -151,11 +151,6 @@ button {
   gap: var(--spacing-md);
 }
 
-.modern-grid.dense {
-  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
-  gap: var(--spacing-sm);
-}
-
 /* --- Page & View Containers --- */
 .page-view {
   display: flex;
