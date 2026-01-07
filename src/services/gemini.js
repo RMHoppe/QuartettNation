@@ -10,6 +10,8 @@ if (API_KEY) {
     console.warn("VITE_GEMINI_API_KEY is not set. Deck generation will not work.");
 }
 
+const FORMAT_ERROR_MSG = "The AI output did not match the expected format. Please try a slightly different input.";
+
 // Get selected model from localStorage or use default
 export function getSelectedModel() {
     return localStorage.getItem('selectedModel') || 'gemma-3-27b-it';
@@ -84,7 +86,13 @@ Top Speed [km/h], Weight [kg], Power [hp], 0-100 Time [s]
 
     const text = await getResponse(prompt);
     // Split by newlines, clean up, remove empty lines
-    const lines = text.split(',').map(line => line.trim());
+    const lines = text.split(',').map(line => line.trim()).filter(l => l.length > 0);
+
+    // Strict validation: Must be exactly 4 categories
+    if (lines.length !== 4) {
+        console.error(`Invalid categories count (${lines.length}/4):`, text);
+        throw new Error(FORMAT_ERROR_MSG);
+    }
 
     // Map to objects, default higherWins to true (user edits later)
     const categories = lines.map(line => ({
@@ -112,6 +120,11 @@ Item 3
         .map(l => l.replace(/^[\d]+[.)\-]\s*/, '').trim()) // Remove potential numbering just in case
         .filter(l => l.length > 0)
         .slice(0, count);
+
+    if (cardNames.length !== count) {
+        console.error(`Invalid card names count (${cardNames.length}/${count}):`, text);
+        throw new Error(FORMAT_ERROR_MSG);
+    }
 
     return { cardNames };
 }
@@ -164,6 +177,11 @@ ${rowsTemplate}
         });
 
         cards.push({ name, values });
+    }
+
+    if (cards.length === 0) {
+        console.error("Invalid card details format (no cards parsed):", text);
+        throw new Error(FORMAT_ERROR_MSG);
     }
 
     return { cards };
