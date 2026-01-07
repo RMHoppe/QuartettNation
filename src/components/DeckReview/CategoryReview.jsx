@@ -18,7 +18,7 @@ const CategoryReview = ({ deck, updateDeck, onNext }) => {
 
     return (
         <div className="category-review">
-            <p style={{ color: 'var(--text-dim)', marginBottom: '1rem', fontSize: '0.9rem' }}>
+            <p className="text-dim" style={{ marginBottom: '1rem', fontSize: '0.9rem' }}>
                 Verify the categories. Click "High" to toggle if a higher value wins.
             </p>
 

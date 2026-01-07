@@ -1,31 +1,65 @@
 :root {
-  /* Colors - Modern, vibrant palette */
-  --primary: #6366f1;
-  --primary-glow: rgba(99, 102, 241, 0.4);
-  --secondary: #ec4899;
-  --accent: #f59e0b;
-  --accent-gold: #ffd700;
-  --background: #0f172a;
-  --surface: #1e293b;
-  --surface-alt: #334155;
-  --text: #f8fafc;
-  --text-dim: #94a3b8;
-  --success: #10b981;
-  --danger: #ef4444;
+  /* Colors - Vintage Nostalgia Palette */
+  --primary: #c94c4c;
+  /* Faded Red */
+  --secondary: #487e95;
+  /* Petroleum Blue */
+  --accent: #dfa546;
+  /* Mustard */
 
-  /* Glassmorphism */
-  --glass: rgba(30, 41, 59, 0.7);
-  --glass-border: rgba(255, 255, 255, 0.1);
-  --glass-blur: blur(12px);
+  --background: #231e18;
+  /* Dark Wood / Basement Shadow */
+  --surface: #f1d8b6;
+  /* Aged Paper / Cardstock */
+  --surface-alt: #e5cba9;
+  /* Darker Paper */
+
+  /* Darker Paper */
+
+  /* Darker Paper */
+
+  /* Strict 4-Color Text Palette */
+  --text-light: #f0ead6;
+  /* Bright Off-White (Global Default) */
+  --text-ink: #0d0d0d;
+  /* Near Black (Paper/Cards) */
+  --text-gold: #dfa546;
+  /* Dark UI Highlights (Mustard) */
+  --text-red: #c94c4c;
+  /* Light UI Highlights (Faded Red) */
+
+  /* Legacy Mapping (To be removed after refactor) */
+  --text: var(--text-light);
+  --text-dim: rgba(240, 234, 214, 0.7);
+  /* Opacity Main */
+  --text-inverse: var(--text-ink);
+  --accent: var(--text-gold);
+
+  --success: #6b8e23;
+  /* Olive Green */
+  --danger: #b22222;
+  /* Brick Red */
+
+  --border-color: #8c7b6c;
+  /* Cardboard Brown */
+  --border-width: 1px;
+
+  /* Shadows (Natural/Soft) */
+  --shadow-color: rgba(0, 0, 0, 0.4);
+  --shadow-sm: 0 1px 2px var(--shadow-color);
+  --shadow-md: 0 4px 6px var(--shadow-color);
+  --shadow-lg: 0 10px 15px -3px var(--shadow-color);
+  --shadow-inner: inset 0 2px 4px rgba(0, 0, 0, 0.1);
 
   /* Spacing & Radii */
-  --radius-sm: 8px;
-  --radius-md: 16px;
-  --radius-lg: 24px;
+  /* Rounded, worn feel */
+  --radius-sm: 6px;
+  --radius-md: 12px;
+  --radius-lg: 20px;
+
   --spacing-xs: 4px;
   --spacing-sm: 8px;
   --spacing-md: 16px;
-  --spacing-lg: 24px;
   --spacing-lg: 24px;
   --spacing-xl: 32px;
 
@@ -34,7 +68,13 @@
   /* Card Dimensions */
   --card-aspect: 2/3;
   --card-width: 100%;
-  --card-max-width: 380px;
+  --card-max-width: 320px;
+  /* Slightly smaller, more handheld feel */
+
+  /* Compatibility Mappings */
+  --glass: var(--surface);
+  --glass-border: rgba(0, 0, 0, 0.1);
+  --glass-blur: none;
 }
 
 * {
@@ -45,8 +85,23 @@
 }
 
 body {
-  font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  font-family: 'Space Mono', 'Courier New', monospace;
+  /* Indie feel */
   background-color: var(--background);
+
+  /* Grainy Gradient Method */
+  /* 1. Base Gradient */
+  background-image:
+    radial-gradient(circle at 60% 90%, rgba(45, 30, 20, 0.4), transparent 60%),
+    radial-gradient(circle at 20% 20%, rgba(0, 0, 0, 0.6), transparent 50%),
+    linear-gradient(#231e18, #1a1612);
+
+  /* 2. Apply SVG Noise Filter */
+  filter: url('#grainy-noise') contrast(110%) brightness(100%);
+
+  /* Important: SVG filter on body can affect fixed inputs, so usually best on a pseudo or wrapper.
+     But for simple app, body is fine. If performance drags, move to a fixed div background. */
+
   color: var(--text);
   line-height: 1.5;
   overflow-x: hidden;
@@ -54,6 +109,50 @@ body {
   display: flex;
   flex-direction: column;
 }
+
+/* Ensure #root is above the grain if needed, but filter applies to everything inside body usually. 
+   Actually, applying filter to body blurs the text! 
+   BETTER APPROACH: Pseudo-element overlay.
+*/
+/* Ensure #root is above the grain if needed, but filter applies to everything inside body usually. 
+   Actually, applying filter to body blurs the text! 
+   BETTER APPROACH: Pseudo-element overlay.
+*/
+body {
+  position: relative;
+  /* Base Gradients on body directly */
+  background-color: var(--background);
+  background-image:
+    radial-gradient(circle at 60% 90%, rgba(70, 50, 40, 0.3), transparent 60%),
+    radial-gradient(circle at 20% 20%, rgba(0, 0, 0, 0.4), transparent 50%),
+    radial-gradient(circle at 50% 50%, var(--background), transparent 80%);
+  z-index: 0;
+}
+
+body::before {
+  /* Explicit Noise Overlay Layer */
+  content: "";
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 9999;
+  /* Force on top of everything */
+  pointer-events: none;
+
+  /* SVG Noise Data URI - High Contrast Version */
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.6' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.4'/%3E%3C/svg%3E");
+  background-size: 100px 100px;
+
+  /* Add blend mode for better integration */
+  mix-blend-mode: overlay;
+  opacity: 1;
+  /* Visible opacity */
+}
+
+/* Remove body::after */
+
 
 #root {
   flex: 1;
@@ -64,8 +163,15 @@ body {
 h1,
 h2,
 h3 {
+  font-family: 'Georgia', 'Times New Roman', serif;
+  /* Serif for headings like old books/cards */
   font-weight: 700;
-  letter-spacing: -0.025em;
+  /* Bold */
+  letter-spacing: 0.05em;
+  color: var(--accent);
+  /* Use gold/mustard for headers */
+  text-shadow: 1px 1px 0px #000;
+  /* Dark stroke for readability */
 }
 
 button {
@@ -73,7 +179,7 @@ button {
   cursor: pointer;
   border: none;
   background: none;
-  transition: all 0.2s ease;
+  transition: all 0.2s ease-out;
 }
 
 /* Base Layout Helpers */
@@ -91,20 +197,36 @@ button {
   gap: var(--spacing-sm);
 }
 
+/* Concept: "Index Cards" in a list */
 .modern-list-item {
   background: var(--surface);
-  border: 1px solid var(--glass-border);
+  color: var(--text-ink);
+  /* Enforce dark on light surface */
+  border: 1px solid var(--border-color);
   border-radius: var(--radius-sm);
+  box-shadow: var(--shadow-sm);
   padding: var(--spacing-md);
   display: flex;
   align-items: center;
   justify-content: space-between;
-  transition: all 0.2s ease;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+/* Enforce dark text hierarchy on paper lists */
+.modern-list-item small,
+.modern-list-item .text-dim,
+.modern-list-item .description {
+  color: var(--text-ink);
+  opacity: 0.7;
+  /* Dark ink faded, not white faded */
 }
 
 .modern-list-item:hover {
-  background: var(--surface-alt);
-  transform: translateX(2px);
+  transform: translateY(-2px) rotate(-0.5deg);
+  /* Slight organic tilt */
+  box-shadow: var(--shadow-md);
+  background: #fff;
+  /* Brighter paper on hover */
 }
 
 .modern-list-item.vertical {
@@ -118,36 +240,46 @@ button {
 }
 
 .glass-panel {
-  background: var(--glass);
-  backdrop-filter: var(--glass-blur);
-  -webkit-backdrop-filter: var(--glass-blur);
-  border: 1px solid var(--glass-border);
+  background: var(--surface);
+  color: var(--text-ink);
+  /* Dark on light */
+  border: 4px solid var(--background);
+  /* Inset look? or just border */
+  outline: 1px solid var(--border-color);
   border-radius: var(--radius-md);
+  box-shadow: var(--shadow-lg);
 }
 
 /* Global App Card Style (Lobby-like container) */
+/* "The Game Box" */
 .app-card {
   max-width: 800px;
   margin: var(--spacing-lg) 0;
   border-radius: var(--radius-lg);
-  background: linear-gradient(to bottom, #1a2332 0%, #111827 100%);
-  box-shadow: 0 0 40px rgba(0, 0, 0, 0.5);
+  background: var(--surface);
+  /* Box interior? or Cardboard */
+  background: #4a3b32;
+  /* Leather/Box color */
+  border: 2px solid #362b24;
+  box-shadow: var(--shadow-lg), inset 0 0 40px rgba(0, 0, 0, 0.5);
   padding: var(--spacing-lg);
-  border: 1px solid var(--glass-border);
+  color: var(--text-primary);
+  /* on dark brown background */
 }
 
 .gradient-text {
-  background: linear-gradient(135deg, #fff 0%, var(--primary-light, #a5b4fc) 100%);
-  background-clip: text;
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  /* Required for gradient text sometimes */
+  /* Vintage Gold Stamp effect */
+  background: none;
+  color: var(--text-accent);
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.6);
+  -webkit-text-stroke: 0;
+  -webkit-text-fill-color: unset;
+  background-clip: unset;
 }
 
 /* Standardized Grid Styles */
 .modern-grid {
   display: grid;
-  /* grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); */
   gap: var(--spacing-md);
 }
 
@@ -165,15 +297,18 @@ button {
 
 /* --- Home Page Specifics --- */
 .hero-title {
-  font-size: 2.5rem;
-  line-height: 1.3;
+  font-size: 3rem;
+  line-height: 1.1;
   margin-bottom: var(--spacing-sm);
-  /* Inherit gradient-text behavior if applied, otherwise default text */
+  color: var(--accent);
+  font-family: 'Times New Roman', serif;
+  font-style: italic;
 }
 
 .hero-subtitle {
-  color: var(--text-dim);
-  font-size: 1.1rem;
+  color: rgba(255, 255, 255, 0.7);
+  font-family: 'Courier New', monospace;
+  font-size: 1rem;
   max-width: 600px;
   margin: 0 auto;
 }
@@ -188,10 +323,13 @@ button {
 
 .recent-games h3 {
   margin-bottom: var(--spacing-md);
-  font-size: 0.9rem;
+  font-size: 1rem;
   text-transform: uppercase;
-  letter-spacing: 0.05em;
+  letter-spacing: 0.1em;
   color: var(--text-dim);
+  border-bottom: 1px solid var(--text-dim);
+  display: inline-block;
+  padding-bottom: 4px;
 }
 
 /* --- Form & Inputs --- */
@@ -203,22 +341,51 @@ button {
 }
 
 .input-group label {
-  font-size: 0.875rem;
-  font-weight: 500;
-  color: var(--text-dim);
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: var(--text-inverse);
+  /* On dark background usually */
+  text-transform: uppercase;
+  font-family: 'Courier New', monospace;
+}
+
+/* Input looks like a paper form field */
+input[type="text"],
+input[type="password"],
+textarea,
+select {
+  background: var(--surface);
+  border: 2px solid #ccc;
+  border-radius: 2px;
+  color: var(--text-ink);
+  /* Ink text for inputs */
+  padding: 10px;
+  font-family: 'Courier New', monospace;
+  font-size: 1rem;
+  box-shadow: inset 1px 1px 4px rgba(0, 0, 0, 0.1);
+  outline: none;
+}
+
+input:focus,
+textarea:focus,
+select:focus {
+  border-color: var(--primary);
+  background: #fff;
 }
 
 /* Replaces .back-link */
 .link-back {
-  color: var(--primary);
-  font-weight: 500;
+  color: var(--secondary);
+  font-weight: 700;
   text-decoration: none;
   display: inline-flex;
   align-items: center;
   gap: 4px;
   margin-bottom: var(--spacing-md);
+  font-family: 'Courier New', monospace;
 }
 
 .link-back:hover {
   text-decoration: underline;
+  transform: translateX(-4px);
 }

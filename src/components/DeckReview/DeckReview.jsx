@@ -96,7 +96,7 @@ const DeckReview = ({ initialPartialDeck, onSave, onCancel, theme, targetCount =
         <div className="deck-review-container">
             {/* Header handled globally now */}
             <div className="review-content">
-                <div className="step-indicator" style={{ textAlign: 'center', marginBottom: 'var(--spacing-md)', color: 'var(--text-dim)', fontSize: '0.9rem' }}>
+                <div className="step-indicator text-dim" style={{ textAlign: 'center', marginBottom: 'var(--spacing-md)', fontSize: '0.9rem' }}>
                     Step {step}/3
                 </div>
                 {step === 1 && (

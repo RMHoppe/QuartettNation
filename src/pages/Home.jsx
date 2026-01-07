@@ -44,11 +44,11 @@ const Home = () => {
                 textAlign: 'center'
             }}>
                 <div style={{ marginBottom: '1rem' }}>
-                    <span style={{ color: 'var(--text-dim)', fontSize: '0.9rem' }}>Currently playing as:</span>
+                    <span className="text-dim" style={{ fontSize: '0.9rem' }}>Currently playing as:</span>
                     <h3 style={{ margin: '4px 0', color: user ? 'var(--primary)' : 'var(--text-main)' }}>
                         {displayName}
                     </h3>
-                    {user && <span style={{ fontSize: '0.8rem', color: 'var(--text-dim)' }}>{user.email}</span>}
+                    {user && <span className="text-dim" style={{ fontSize: '0.8rem' }}>{user.email}</span>}
                 </div>
 
                 {user ? (

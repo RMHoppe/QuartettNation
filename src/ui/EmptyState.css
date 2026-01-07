@@ -17,6 +17,6 @@
 }
 
 .empty-message {
-    color: var(--text-dim);
+    color: var(--text-ink);
     font-size: 0.95rem;
 }

@@ -66,7 +66,7 @@ const Collection = () => {
 
     const DeckList = ({ items, title }) => (
         <div style={{ marginBottom: '2rem' }}>
-            <h3 style={{ marginBottom: '1rem', color: 'var(--text-dim)', textTransform: 'uppercase', fontSize: '0.9rem', letterSpacing: '0.05em' }}>{title}</h3>
+            <h3 className="text-dim" style={{ marginBottom: '1rem', textTransform: 'uppercase', fontSize: '0.9rem', letterSpacing: '0.05em' }}>{title}</h3>
             <div className="modern-list">
                 {items.map(deck => {
                     const isOwner = !deck.isShared;
@@ -75,13 +75,13 @@ const Collection = () => {
                         <div key={deck.id} className="modern-list-item">
                             <div className="deck-info" onClick={() => setSelectedDeckId(deck.id)} style={{ cursor: 'pointer', flex: 1 }}>
                                 <h3>{deck.name}</h3>
-                                <p style={{ color: 'var(--text-dim)', fontSize: '0.85rem', margin: '4px 0' }}>
+                                <p className="text-dim" style={{ fontSize: '0.85rem', margin: '4px 0' }}>
                                     {deck.categories?.map(c => c.name).join(' • ')}
                                 </p>
-                                <div className="deck-meta" style={{ display: 'flex', gap: '12px', fontSize: '0.8rem', color: 'var(--text-dim)' }}>
+                                <div className="deck-meta text-dim" style={{ display: 'flex', gap: '12px', fontSize: '0.8rem' }}>
                                     <span>{deck.cards?.[0]?.count || 0} Cards</span>
                                     <span>{new Date(deck.created_at).toLocaleDateString()}</span>
-                                    {deck.isShared && <span style={{ color: 'var(--accent)', fontWeight: 'bold' }}>Shared</span>}
+                                    {deck.isShared && <span style={{ color: 'var(--text-gold)', fontWeight: 'bold' }}>Shared</span>}
                                 </div>
                             </div>
                             <div className="deck-actions">

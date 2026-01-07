@@ -1,79 +1,41 @@
 .card-back-content {
     width: 100%;
     height: 100%;
-    background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+    /* Transparent so parent background shows */
+    background: transparent;
     border-radius: var(--radius-lg);
-    border: 2px solid var(--glass-border);
+    border: none;
     position: relative;
     overflow: hidden;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    box-shadow: inset 0 0 20px rgba(0, 0, 0, 0.5);
-    /* No transform here! The parent container handles the flip rotation */
-}
-
-/* Container for the rotated grid of text */
-.card-back-pattern {
-    position: absolute;
-    top: -50%;
-    left: -50%;
-    width: 200%;
-    height: 200%;
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    transform: rotate(-35deg);
-    opacity: 0.07;
-    pointer-events: none;
-    gap: 0.5rem;
-    /* Gap between lines */
+    box-shadow: none;
 }
 
-/* Each row of text */
-.pattern-row {
-    display: flex;
-    gap: 1rem;
-    white-space: nowrap;
-}
-
-/* Text styling */
-.pattern-text-item {
-    font-family: 'Inter', sans-serif;
-    font-weight: 900;
-    font-size: 1.2rem;
-    color: white;
-    text-transform: uppercase;
-    line-height: 1;
-}
-
-/* Offset every other row to create brick pattern */
-.pattern-row:nth-child(even) {
-    transform: translateX(100px);
-}
+/* Removed pattern styles */
 
 .card-back-logo {
-    font-family: 'Inter', sans-serif;
-    font-weight: 800;
-    font-size: 3rem;
-    background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
-    -webkit-background-clip: text;
-    background-clip: text;
-    color: transparent;
-    border: 4px solid var(--primary);
-    border-image: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%) 1;
-    /* Fallback border */
-    border: 4px solid rgba(255, 255, 255, 0.1);
+    font-family: 'Times New Roman', serif;
+    font-weight: 900;
+    font-size: 2rem;
+    color: var(--surface);
+    /* Cream text */
+    text-transform: uppercase;
+    letter-spacing: 0.2em;
+    border-bottom: 2px solid var(--text-gold);
+    padding-bottom: 4px;
+    margin-bottom: 4px;
+    text-shadow: 2px 2px 0px rgba(0, 0, 0, 0.3);
+}
 
-    width: 100px;
-    height: 100px;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background-color: rgba(0, 0, 0, 0.3);
-    backdrop-filter: blur(4px);
-    box-shadow: 0 0 20px rgba(99, 102, 241, 0.3);
-    z-index: 2;
+.card-back-sub {
+    font-family: 'Courier New', monospace;
+    font-weight: 700;
+    font-size: 1.2rem;
+    color: var(--text-gold);
+    /* Strict Gold */
+    letter-spacing: 0.5em;
+    text-shadow: 1px 1px 0px rgba(0, 0, 0, 0.3);
 }

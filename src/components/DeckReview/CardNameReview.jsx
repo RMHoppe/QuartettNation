@@ -12,14 +12,14 @@ const CardNameReview = ({ deck, updateDeck, onNext }) => {
 
     return (
         <div className="card-name-review">
-            <p style={{ color: 'var(--text-dim)', marginBottom: '1rem', fontSize: '0.9rem' }}>
+            <p className="text-dim" style={{ marginBottom: '1rem', fontSize: '0.9rem' }}>
                 Review all 32 card names. Click on any name to edit it.
             </p>
 
             <div className="modern-list">
                 {cards.map((card, idx) => (
                     <div key={idx} className="modern-list-item">
-                        <span className="index" style={{ minWidth: '30px', color: 'var(--text-dim)', fontSize: '0.8rem' }}>#{idx + 1}</span>
+                        <span className="index text-dim" style={{ minWidth: '30px', fontSize: '0.8rem' }}>#{idx + 1}</span>
                         <Input
                             value={card.name}
                             onChange={(e) => handleNameChange(idx, e.target.value)}

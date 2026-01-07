@@ -107,7 +107,7 @@ const Auth = () => {
                     </Button>
                 </form>
 
-                <div style={{ marginTop: '1.5rem', textAlign: 'center', fontSize: '0.9rem', color: 'var(--text-dim)' }}>
+                <div className="text-dim" style={{ marginTop: '1.5rem', textAlign: 'center', fontSize: '0.9rem' }}>
                     {isSignUp ? 'Already have an account?' : "Don't have an account?"}
                     <button
                         onClick={() => setIsSignUp(!isSignUp)}
