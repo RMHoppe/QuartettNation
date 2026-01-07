@@ -1,6 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react'
 import { useQuery } from '@tanstack/react-query'
-import { useGesture } from '@use-gesture/react'
 import { searchImages } from '../../services/wikimedia'
 import { searchOpenverseImages } from '../../services/openverse'
 import { Button, Spinner, Input } from '../../ui'
@@ -9,6 +8,8 @@ import './CardStudio.css'
 const CardStudio = ({ deck, updateDeck, onSave, currentIndex = 0, onNavigate, isModal = false }) => {
     // Image Editing State
     const [position, setPosition] = useState({ x: 0, y: 0, scale: 1 })
+    const [isDragging, setIsDragging] = useState(false)
+    const [dragStart, setDragStart] = useState({ x: 0, y: 0 })
     const [customUrl, setCustomUrl] = useState('')
     const [source, setSource] = useState('wikimedia') // 'wikimedia' | 'openverse'
 
@@ -40,13 +41,14 @@ const CardStudio = ({ deck, updateDeck, onSave, currentIndex = 0, onNavigate, is
         }
     }, [currentIndex, deck.cards, hasChanges]);
 
+    // Safety check
+    if (!deck || !deck.cards || !deck.cards[currentIndex]) return <div className="p-4 text-red-500">Error: Card not found</div>;
+
     // -- React Query for Images --
     const { data: alternatives = [], isLoading: isLoadingAlts } = useQuery({
         queryKey: ['images', source, deck.cards[currentIndex].name],
         queryFn: async () => {
             const card = deck.cards[currentIndex];
-            // Prefer existing cache on card if available AND matching source logic
-            // (Simplification: just search, react-query handles its own cache)
             if (source === 'wikimedia') return searchImages(card.name, 20);
             if (source === 'openverse') return searchOpenverseImages(card.name, 20);
             return [];
@@ -55,32 +57,48 @@ const CardStudio = ({ deck, updateDeck, onSave, currentIndex = 0, onNavigate, is
         refetchOnWindowFocus: false
     });
 
-    // -- Use Gesture for Interaction --
-    // We bind gesture events to the wrapper
-    const bind = useGesture({
-        onDrag: ({ offset: [dx, dy] }) => {
-            setPosition(prev => ({ ...prev, x: dx, y: dy }))
-            setHasChanges(true)
-        },
-        onWheel: ({ event, delta: [, dy] }) => {
-            event.preventDefault(); // Prevent page scroll
-            const delta = dy * -0.001;
+    // -- Manual Interaction Handlers (Restored for stability) --
+    const handlePointerDown = (e) => {
+        setIsDragging(true)
+        setDragStart({ x: e.clientX - position.x, y: e.clientY - position.y })
+        e.target.setPointerCapture(e.pointerId);
+    }
+
+    const handlePointerMove = (e) => {
+        if (isDragging) {
+            const newPos = {
+                ...position,
+                x: e.clientX - dragStart.x,
+                y: e.clientY - dragStart.y
+            };
+            setPosition(newPos);
+            setHasChanges(true);
+        }
+    }
+
+    const handlePointerUp = (e) => {
+        setIsDragging(false)
+        e.target.releasePointerCapture(e.pointerId);
+    }
+
+    // Native wheel listener for Zoom
+    useEffect(() => {
+        const wrapper = wrapperRef.current
+        if (!wrapper) return
+
+        const handleWheelNative = (e) => {
+            e.preventDefault()
+            const delta = e.deltaY * -0.001
             setPosition(prev => {
                 const newScale = Math.min(Math.max(0.5, prev.scale + delta), 3)
                 return { ...prev, scale: newScale }
             })
             setHasChanges(true)
         }
-    }, {
-        drag: {
-            from: () => [position.x, position.y], // Sync with current state
-            filterTaps: true
-        },
-        wheel: {
-            domTarget: wrapperRef, // Important for non-passive listener
-            eventOptions: { passive: false }
-        }
-    })
+
+        wrapper.addEventListener('wheel', handleWheelNative, { passive: false })
+        return () => wrapper.removeEventListener('wheel', handleWheelNative)
+    }, [])
 
     // -- State Updates --
     const selectAlternative = (img) => {
@@ -126,9 +144,6 @@ const CardStudio = ({ deck, updateDeck, onSave, currentIndex = 0, onNavigate, is
         }
     }
 
-    // Attach passive: false properly for wheel via config above, 
-    // but react-use-gesture specific behavior usually needs the ref attached.
-
     return (
         <div className="card-studio">
             <div className="studio-header">
@@ -150,10 +165,12 @@ const CardStudio = ({ deck, updateDeck, onSave, currentIndex = 0, onNavigate, is
                             <div
                                 ref={wrapperRef}
                                 className="card-image-wrapper studio-interactive-image"
-                                {...bind()} // Spread gesture handlers
+                                onPointerDown={handlePointerDown}
+                                onPointerMove={handlePointerMove}
+                                onPointerUp={handlePointerUp}
                                 style={{
-                                    touchAction: 'none', // Critical for dragging on touch/mobile
-                                    cursor: 'grab'
+                                    touchAction: 'none',
+                                    cursor: isDragging ? 'grabbing' : 'grab'
                                 }}
                             >
                                 <img
