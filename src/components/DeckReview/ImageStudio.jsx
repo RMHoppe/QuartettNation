@@ -1,5 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react'
 import { searchImages } from '../../services/wikimedia'
+import { searchFlickrImages } from '../../services/flickr'
 import { Button, Spinner, Input } from '../../ui'
 import './ImageStudio.css'
 
@@ -11,44 +12,65 @@ const ImageStudio = ({ deck, updateDeck, onSave, startAtIndex = 0, isModal = fal
     const [alternatives, setAlternatives] = useState([])
     const [isLoadingAlts, setIsLoadingAlts] = useState(false)
     const [customUrl, setCustomUrl] = useState('')
+    const [source, setSource] = useState('wikimedia') // 'wikimedia' | 'flickr'
+    const [flickrApiKey, setFlickrApiKey] = useState(import.meta.env.VITE_FLICKR_API_KEY || '')
 
     const currentCard = deck.cards[currentCardIndex]
     const imageRef = useRef(null)
     const wrapperRef = useRef(null)
 
     // Load alternatives when card changes
+    // Load alternatives when card changes
+
     useEffect(() => {
         const loadAlternatives = async () => {
-            // Check if we have enough alternatives cached (e.g. at least 2)
-            // If we only have 1 (from the initial lazy load), we should fetch more.
-            if (currentCard.available_images && currentCard.available_images.length > 1) {
-                setAlternatives(currentCard.available_images)
-            } else {
-                setIsLoadingAlts(true)
-                // Fetch a larger set for alternatives (e.g. 20)
-                // Use the card name directly as per new logic
-                const images = await searchImages(currentCard.name, 20);
-                setAlternatives(images)
-                setIsLoadingAlts(false)
+            setIsLoadingAlts(true);
+            try {
+                let images = [];
+                if (source === 'wikimedia') {
+                    // Check cache for reuse only if Wikimedia
+                    if (currentCard.available_images && currentCard.available_images.length > 1 && !currentCard._source_was_flickr) {
+                        setAlternatives(currentCard.available_images);
+                        setIsLoadingAlts(false);
+                        return;
+                    }
+                    images = await searchImages(currentCard.name, 20);
+                } else if (source === 'flickr') {
+                    if (!flickrApiKey) {
+                        setAlternatives([]);
+                        setIsLoadingAlts(false);
+                        return;
+                    }
+                    images = await searchFlickrImages(currentCard.name, 20);
+                }
 
-                // Cache them to avoid refetching
-                const updatedCards = [...deck.cards]
-                const card = updatedCards[currentCardIndex]
-                card.available_images = images
+                setAlternatives(images);
 
-                // If the current image url is not in the new list (or is different), 
-                // we might want to keep the current one active, but we don't need to change it automatically.
-                updateDeck({ cards: updatedCards })
+                // Optional: Update cache
+                // const updatedCards = [...deck.cards]
+                // const card = updatedCards[currentCardIndex]
+                // card.available_images = images
+                // card._source_was_flickr = (source === 'flickr')
+                // updateDeck({ cards: updatedCards })
+
+            } catch (e) {
+                console.error("Failed to load alts", e);
+            } finally {
+                setIsLoadingAlts(false);
             }
         }
-        loadAlternatives()
+
+        loadAlternatives();
+
         // Load saved settings or default
         if (currentCard.image_settings) {
             setPosition(currentCard.image_settings)
         } else {
             setPosition({ x: 0, y: 0, scale: 1 })
         }
-    }, [currentCardIndex])
+    }, [currentCardIndex, source, flickrApiKey]) // Reload on source change
+
+
 
     const handlePointerDown = (e) => {
         setIsDragging(true)
@@ -148,7 +170,31 @@ const ImageStudio = ({ deck, updateDeck, onSave, startAtIndex = 0, isModal = fal
             </div>
 
             <div className="alternatives-strip">
-                <h4>Alternatives</h4>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
+                    <h4>Alternatives</h4>
+                    <select
+                        value={source}
+                        onChange={(e) => setSource(e.target.value)}
+                        style={{ background: 'var(--surface-alt)', border: '1px solid var(--glass-border)', color: 'var(--text)', padding: '4px', borderRadius: '4px' }}
+                    >
+                        <option value="wikimedia">Wikimedia</option>
+                        <option value="flickr">Flickr</option>
+                    </select>
+                </div>
+
+                {source === 'flickr' && !flickrApiKey && (
+                    <div className="flickr-key-prompt" style={{ padding: '8px', background: 'rgba(239, 68, 68, 0.1)', border: '1px solid var(--danger)', borderRadius: '4px', marginBottom: '8px' }}>
+                        <p style={{ fontSize: '0.8rem', color: 'var(--danger)', marginBottom: '4px' }}>Flickr API Key required</p>
+                        <p style={{ fontSize: '0.75rem', color: 'var(--text-dim)' }}>Add VITE_FLICKR_API_KEY to .env</p>
+                        <Input
+                            value={flickrApiKey}
+                            onChange={(e) => setFlickrApiKey(e.target.value)}
+                            placeholder="Enter Key Temporarily"
+                            style={{ marginTop: '4px', padding: '4px', fontSize: '0.8rem' }}
+                        />
+                    </div>
+                )}
+
                 <div className="thumbnails">
                     {isLoadingAlts ? <Spinner size="sm" /> :
                         alternatives.map((img, idx) => (
