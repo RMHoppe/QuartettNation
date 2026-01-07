@@ -39,7 +39,7 @@
 
 .card-edit-btn:hover {
     transform: scale(1.1);
-    background: var(--primary-hover, #4f46e5);
+    background: var(--primary);
 }
 
 /* New Wrapper */

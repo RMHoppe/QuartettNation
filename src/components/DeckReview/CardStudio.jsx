@@ -1,20 +1,16 @@
 import React, { useState, useRef, useEffect } from 'react'
+import { useQuery } from '@tanstack/react-query'
+import { useGesture } from '@use-gesture/react'
 import { searchImages } from '../../services/wikimedia'
-import { searchFlickrImages } from '../../services/flickr'
+import { searchOpenverseImages } from '../../services/openverse'
 import { Button, Spinner, Input } from '../../ui'
 import './CardStudio.css'
 
 const CardStudio = ({ deck, updateDeck, onSave, currentIndex = 0, onNavigate, isModal = false }) => {
     // Image Editing State
     const [position, setPosition] = useState({ x: 0, y: 0, scale: 1 })
-    const [isDragging, setIsDragging] = useState(false)
-    const [dragStart, setDragStart] = useState({ x: 0, y: 0 })
-    const [alternatives, setAlternatives] = useState([])
-    const [isLoadingAlts, setIsLoadingAlts] = useState(false)
     const [customUrl, setCustomUrl] = useState('')
-    const [source, setSource] = useState('wikimedia') // 'wikimedia' | 'flickr'
-    const [flickrApiKey, setFlickrApiKey] = useState(import.meta.env.VITE_FLICKR_API_KEY || '')
-    const [showKeyInput, setShowKeyInput] = useState(false)
+    const [source, setSource] = useState('wikimedia') // 'wikimedia' | 'openverse'
 
     // Local Editing State
     const [localCard, setLocalCard] = useState({ ...deck.cards[currentIndex] });
@@ -25,137 +21,66 @@ const CardStudio = ({ deck, updateDeck, onSave, currentIndex = 0, onNavigate, is
 
     const prevIndexRef = useRef(currentIndex);
 
-    // Sync local state when card index changes (navigation) or background updates occur
+    // Sync local state when card index changes (navigation)
     useEffect(() => {
         const indexChanged = prevIndexRef.current !== currentIndex;
 
         if (indexChanged) {
-            // Navigation: Always load new card and reset state
             setLocalCard({ ...deck.cards[currentIndex] });
             setHasChanges(false);
 
-            // Reset Image Position
             if (deck.cards[currentIndex].image_settings) {
                 setPosition(deck.cards[currentIndex].image_settings);
             } else {
                 setPosition({ x: 0, y: 0, scale: 1 });
             }
-
             prevIndexRef.current = currentIndex;
         } else if (!hasChanges) {
-            // No local changes: Safe to sync with background updates (e.g. lazy loaded images)
-            // We check if the data actually differs to avoid unnecessary renders/loops, 
-            // though React handles mostly-equal state updates well enough.
-            setLocalCard(prev => {
-                // Simple optimization: if image URL is same, assume same. 
-                // Full deep equal is expensive, but for this bug (image disappearing), 
-                // just ensuring we don't overwrite if we ARE editing (hasChanges=true) is the key.
-                // consistently receiving fresh data when !hasChanges is fine.
-                return { ...deck.cards[currentIndex] };
-            });
+            setLocalCard(prev => ({ ...deck.cards[currentIndex] }));
         }
-        // If hasChanges is true, we IGNORE prop updates to protect user work.
-
     }, [currentIndex, deck.cards, hasChanges]);
 
-    // Setup for Image Loading (Alternatives)
-    useEffect(() => {
-        const loadAlternatives = async () => {
-            setIsLoadingAlts(true);
-            const originalCard = deck.cards[currentIndex];
+    // -- React Query for Images --
+    const { data: alternatives = [], isLoading: isLoadingAlts } = useQuery({
+        queryKey: ['images', source, deck.cards[currentIndex].name],
+        queryFn: async () => {
+            const card = deck.cards[currentIndex];
+            // Prefer existing cache on card if available AND matching source logic
+            // (Simplification: just search, react-query handles its own cache)
+            if (source === 'wikimedia') return searchImages(card.name, 20);
+            if (source === 'openverse') return searchOpenverseImages(card.name, 20);
+            return [];
+        },
+        staleTime: 1000 * 60 * 60, // 1 hour
+        refetchOnWindowFocus: false
+    });
 
-            try {
-                let images = [];
-                if (source === 'wikimedia') {
-                    // Cache check for Wikimedia only (legacy behavior)
-                    if (originalCard.available_images && originalCard.available_images.length > 1 && !originalCard._source_was_flickr) {
-                        setAlternatives(originalCard.available_images);
-                        setIsLoadingAlts(false);
-                        return;
-                    }
-                    images = await searchImages(originalCard.name, 20);
-                } else if (source === 'flickr') {
-                    if (!flickrApiKey) {
-                        setAlternatives([]);
-                        setIsLoadingAlts(false);
-                        return; // Wait for key
-                    }
-                    // Temporarily mock environment env if needed but better pass clean
-                    // We need to ensure the service uses the user provided key if env is missing
-                    // For now, let's assume the user put it in .env or we need a way to pass it to service
-                    // Actually, the service reads import.meta.env.VITE_FLICKR_API_KEY. 
-                    // To support runtime key entry, we need to update the service or just put it in a global/context.
-                    // For this iteration, let's assume we might need to patch the service to accept a key
-                    // OR we just rely on .env for now as per "is it safe" discussion implied user understands .env
-                    // BUT my plan said "UI selector... show prompt".
-
-                    // Let's pass the key to the search function. I need to update flickr.js slightly to accept it?
-                    // I defined searchFlickrImages(query, limit). I should probably modify it to accept key implicitly or explicitly.
-                    // Let's just try to call it. It reads env. If empty, it returns [].
-                    // If I want to support manual entry effectively, I should update flickr.js.
-                    // For now, let's stick to the interface I created.
-                    images = await searchFlickrImages(originalCard.name, 20);
-                }
-
-                setAlternatives(images);
-
-                // Optional: Cache these if we want
-                // const updatedCards = [...deck.cards]
-                // updatedCards[currentIndex].available_images = images
-                // updatedCards[currentIndex]._source_was_flickr = (source === 'flickr')
-                // updateDeck({ cards: updatedCards }) 
-            } catch (e) {
-                console.error("Failed to load alts", e);
-            } finally {
-                setIsLoadingAlts(false);
-            }
-        }
-
-        loadAlternatives();
-    }, [currentIndex, deck.cards, source, flickrApiKey]); // Reload when source or key changes
-
-    // -- Image Interaction Handlers --
-    const handlePointerDown = (e) => {
-        setIsDragging(true)
-        setDragStart({ x: e.clientX - position.x, y: e.clientY - position.y })
-        e.target.setPointerCapture(e.pointerId);
-    }
-
-    const handlePointerMove = (e) => {
-        if (isDragging) {
-            const newPos = {
-                ...position,
-                x: e.clientX - dragStart.x,
-                y: e.clientY - dragStart.y
-            };
-            setPosition(newPos);
-            setHasChanges(true); // Dragging counts as change
-        }
-    }
-
-    const handlePointerUp = (e) => {
-        setIsDragging(false)
-        e.target.releasePointerCapture(e.pointerId);
-    }
-
-    // Native wheel listener to support passive: false (required to preventDefault wheel scroll)
-    useEffect(() => {
-        const wrapper = wrapperRef.current
-        if (!wrapper) return
-
-        const handleWheelNative = (e) => {
-            e.preventDefault()
-            const delta = e.deltaY * -0.001
+    // -- Use Gesture for Interaction --
+    // We bind gesture events to the wrapper
+    const bind = useGesture({
+        onDrag: ({ offset: [dx, dy] }) => {
+            setPosition(prev => ({ ...prev, x: dx, y: dy }))
+            setHasChanges(true)
+        },
+        onWheel: ({ event, delta: [, dy] }) => {
+            event.preventDefault(); // Prevent page scroll
+            const delta = dy * -0.001;
             setPosition(prev => {
                 const newScale = Math.min(Math.max(0.5, prev.scale + delta), 3)
                 return { ...prev, scale: newScale }
             })
             setHasChanges(true)
         }
-
-        wrapper.addEventListener('wheel', handleWheelNative, { passive: false })
-        return () => wrapper.removeEventListener('wheel', handleWheelNative)
-    }, []) // Setters are stable
+    }, {
+        drag: {
+            from: () => [position.x, position.y], // Sync with current state
+            filterTaps: true
+        },
+        wheel: {
+            domTarget: wrapperRef, // Important for non-passive listener
+            eventOptions: { passive: false }
+        }
+    })
 
     // -- State Updates --
     const selectAlternative = (img) => {
@@ -188,7 +113,6 @@ const CardStudio = ({ deck, updateDeck, onSave, currentIndex = 0, onNavigate, is
     };
 
     const handleNext = () => {
-        // No auto-save on navigation anymore, user must explicitly save
         if (currentIndex < deck.cards.length - 1) {
             onNavigate(currentIndex + 1);
         } else {
@@ -197,11 +121,13 @@ const CardStudio = ({ deck, updateDeck, onSave, currentIndex = 0, onNavigate, is
     }
 
     const handlePrev = () => {
-        // No auto-save on navigation anymore
         if (currentIndex > 0) {
             onNavigate(currentIndex - 1);
         }
     }
+
+    // Attach passive: false properly for wheel via config above, 
+    // but react-use-gesture specific behavior usually needs the ref attached.
 
     return (
         <div className="card-studio">
@@ -214,7 +140,7 @@ const CardStudio = ({ deck, updateDeck, onSave, currentIndex = 0, onNavigate, is
                 <div className="studio-card-frame card-scene">
                     <div className="card-inner">
                         <div className="card-face card-front" style={{ position: 'relative' }}>
-                            {/* 1. Top Section - Reusing Card.css */}
+                            {/* 1. Top Section */}
                             <div className="card-top-section">
                                 {deck.theme && <div className="deck-name">{deck.theme}</div>}
                                 <h3 className="card-name">{localCard.name}</h3>
@@ -224,10 +150,11 @@ const CardStudio = ({ deck, updateDeck, onSave, currentIndex = 0, onNavigate, is
                             <div
                                 ref={wrapperRef}
                                 className="card-image-wrapper studio-interactive-image"
-                                onPointerDown={handlePointerDown}
-                                onPointerMove={handlePointerMove}
-                                onPointerUp={handlePointerUp}
-                                style={{ cursor: isDragging ? 'grabbing' : 'grab' }}
+                                {...bind()} // Spread gesture handlers
+                                style={{
+                                    touchAction: 'none', // Critical for dragging on touch/mobile
+                                    cursor: 'grab'
+                                }}
                             >
                                 <img
                                     ref={imageRef}
@@ -237,7 +164,7 @@ const CardStudio = ({ deck, updateDeck, onSave, currentIndex = 0, onNavigate, is
                                     style={{
                                         transform: `translate(${position.x}px, ${position.y}px) scale(${position.scale})`,
                                         transformOrigin: 'center',
-                                        pointerEvents: 'none' // Let events bubble to wrapper
+                                        pointerEvents: 'none'
                                     }}
                                     draggable={false}
                                 />
@@ -246,7 +173,7 @@ const CardStudio = ({ deck, updateDeck, onSave, currentIndex = 0, onNavigate, is
                                 </div>
                             </div>
 
-                            {/* 3. Stats Area - Reusing Card.css + Editable Overrides */}
+                            {/* 3. Stats Area */}
                             <div className="card-content">
                                 <div className="card-stats">
                                     {deck.categories.map((cat, idx) => {
@@ -296,17 +223,10 @@ const CardStudio = ({ deck, updateDeck, onSave, currentIndex = 0, onNavigate, is
                                 style={{ background: 'var(--surface-alt)', border: '1px solid var(--glass-border)', color: 'var(--text)', padding: '4px', borderRadius: '4px' }}
                             >
                                 <option value="wikimedia">Wikimedia (Commons)</option>
-                                <option value="flickr">Flickr (Creative Commons)</option>
+                                <option value="openverse">Openverse (Creative Commons)</option>
                             </select>
                         </div>
                     </div>
-
-                    {source === 'flickr' && !flickrApiKey && (
-                        <div className="flickr-key-prompt" style={{ padding: '8px', background: 'rgba(239, 68, 68, 0.1)', border: '1px solid var(--danger)', borderRadius: '4px', marginBottom: '8px' }}>
-                            <p style={{ fontSize: '0.8rem', color: 'var(--danger)', marginBottom: '4px' }}>Flickr API Key required</p>
-                            <p style={{ fontSize: '0.75rem', color: 'var(--text-dim)' }}>Add VITE_FLICKR_API_KEY to .env</p>
-                        </div>
-                    )}
 
                     <div className="thumbnails">
                         {isLoadingAlts ? <Spinner size="sm" /> :
@@ -348,17 +268,11 @@ const CardStudio = ({ deck, updateDeck, onSave, currentIndex = 0, onNavigate, is
             <div className="studio-nav">
                 <Button
                     onClick={handlePrev}
-                    disabled={currentIndex === 0 || hasChanges} // Disable if changes are pending
+                    disabled={currentIndex === 0 || hasChanges}
                     variant="secondary"
                 >
                     ← Previous
                 </Button>
-                {/* Save Button is the primary action now. Navigation can stay if helpful but saving must be manual per request? 
-                    "On clicking the close button... unsaved changes... lost".
-                    User implies "Close" (Modal x) vs "Save".
-                    If we support navigation, we should probably warn or auto-save?
-                    Let's keep it simple: "Save Changes" is the main button. 
-                */}
                 <Button
                     onClick={handleSave}
                     variant="primary"
@@ -368,7 +282,7 @@ const CardStudio = ({ deck, updateDeck, onSave, currentIndex = 0, onNavigate, is
                 </Button>
                 <Button
                     onClick={handleNext}
-                    disabled={currentIndex === deck.cards.length - 1 && !isModal || hasChanges} // Disable if changes are pending
+                    disabled={currentIndex === deck.cards.length - 1 && !isModal || hasChanges}
                     variant="secondary"
                 >
                     {isModal && currentIndex === deck.cards.length - 1 ? 'Done' : (currentIndex === deck.cards.length - 1 ? 'Finish' : 'Next →')}

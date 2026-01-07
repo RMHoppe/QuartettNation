@@ -33,15 +33,8 @@ const limitConcurrency = (fn) => {
 
 
 // Helper to clean query (remove technical terms that confuse search)
-const cleanQuery = (query) => {
-    if (!query) return '';
-    const stopWords = ['1:1', 'aspect ratio', 'studio lighting', 'view', 'profile', 'front', 'side', 'detailed', '4k', 'hd', 'close-up'];
-    let cleaned = query.toLowerCase();
-    stopWords.forEach(word => {
-        cleaned = cleaned.replace(word, '');
-    });
-    return cleaned.replace(/\s+/g, ' ').trim();
-}
+// Removed query cleaning as per request
+const cleanQuery = (query) => query;
 
 const performSearch = async (clean, limit) => {
     // Helper to perform the actual fetch

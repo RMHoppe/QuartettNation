@@ -39,16 +39,19 @@ const GridCardItem = ({ card, index, onEdit, onImageLoaded, categories, deckName
                 compact={false}
                 enableFlip={true}
             />
-            <button
+            <Button
                 className="card-edit-btn"
                 aria-label="Edit Card"
                 onClick={(e) => {
                     e.stopPropagation()
                     onEdit(index)
                 }}
+                variant="secondary"
+                size="sm"
+                style={{ position: 'absolute', top: 'var(--spacing-xs)', right: 'var(--spacing-xs)', zIndex: 10, padding: '4px', minHeight: 'unset' }}
             >
                 <Pencil size={16} />
-            </button>
+            </Button>
         </div>
     )
 }
