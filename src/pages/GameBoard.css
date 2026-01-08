@@ -3,7 +3,7 @@
     /* padding-bottom removed; handled by layout */
     max-width: 1200px;
     margin: 0 auto;
-    color: var(--text);
+    color: var(--text-light);
     /* min-height handled by flex layout */
     display: flex;
     flex-direction: column;
@@ -11,12 +11,13 @@
 
 .game-header {
     display: flex;
-    justify-content: space-between;
-    font-size: 1.5rem;
-    font-weight: bold;
-    margin-bottom: var(--spacing-xl);
-    padding-bottom: var(--spacing-md);
-    border-bottom: 1px solid var(--glass-border);
+    justify-content: center;
+    width: 100%;
+    position: relative;
+    z-index: 10;
+    margin-bottom: var(--spacing-sm);
+    /* Reduced from md */
+    padding-bottom: 0;
 }
 
 .turn-indicator {
@@ -48,51 +49,106 @@
     }
 }
 
-.opponents-strip {
+.players-strip {
     display: flex;
     justify-content: center;
-    gap: var(--spacing-xl);
+    gap: var(--spacing-md);
     margin-bottom: var(--spacing-xl);
+    flex-wrap: wrap;
+    /* Allow wrap if many players */
 }
 
-.opponent-card {
-    background: rgba(255, 255, 255, 0.05);
-    /* Could define var(--surface-light) */
-    padding: var(--spacing-md);
-    border-radius: var(--radius-sm);
-    min-width: 120px;
+.game-player-card {
+    background: transparent;
+    padding: 2px 6px;
+    min-width: 60px;
     text-align: center;
-    border: 2px solid transparent;
+    border: none;
+    box-shadow: none;
+    transition: all 0.3s ease;
+    opacity: 0.6;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    position: relative;
 }
 
-.opponent-card.active-turn {
+.game-player-card.active-turn {
+    opacity: 1;
+    transform: scale(1.1);
+}
+
+.game-player-card.active-turn .player-avatar {
+    box-shadow: 0 0 10px var(--accent-gold);
     border-color: var(--accent-gold);
     background: rgba(255, 215, 0, 0.1);
 }
 
-.opponent-card.eliminated-p {
-    opacity: 0.5;
-    text-decoration: line-through;
+.game-player-card.my-player-card .player-avatar {
+    border-color: var(--primary);
+    border-width: 2px;
 }
 
-.opponent-avatar {
-    font-size: 2rem;
-    margin-bottom: var(--spacing-sm);
+.game-player-card.eliminated-p {
+    opacity: 0.3;
+    filter: grayscale(1);
 }
+
+.player-avatar {
+    font-size: 1.2rem;
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 4px;
+    transition: all 0.3s ease;
+}
+
+.player-name {
+    font-size: 0.75rem;
+    font-weight: 500;
+    color: var(--text-light);
+    /* Changed back to light since not on white surface anymore */
+    line-height: 1.1;
+    max-width: 80px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.player-hand-count {
+    font-size: 0.7rem;
+    color: var(--text-light);
+    opacity: 0.6;
+    margin-top: 0;
+}
+
+
 
 .main-play-area {
     display: flex;
     flex-direction: column;
-    align-items: center;
-    gap: var(--spacing-xl);
+    width: 100%;
+    /* Removed align-items: center to allow full width usage */
+    gap: var(--spacing-md);
+    /* Reduced from xl */
     flex: 1;
 }
 
 .my-card-section {
     width: 100%;
-    transform: scale(1.1);
+    display: flex;
+    justify-content: center;
+    /* Removed transform scale to avoid layout confusion, resizing Card via max-width if needed */
     transition: transform 0.3s;
 }
+
+
 
 .controls-section {
     width: 100%;
@@ -102,8 +158,8 @@
 
 .category-buttons h3 {
     margin-bottom: var(--spacing-md);
-    color: #ccc;
-    /* Could be var(--text-dim) */
+    color: var(--text-light);
+    opacity: 0.7;
 }
 
 .buttons-grid {
@@ -132,7 +188,7 @@
 
 .waiting-message {
     font-style: italic;
-    color: var(--text-dim);
+    color: var(--text-light);
     margin-top: var(--spacing-xl);
 }
 
@@ -143,5 +199,87 @@
     border-radius: 4px;
     margin-bottom: var(--spacing-md);
     font-size: 0.9rem;
-    color: var(--text-dim);
+    color: var(--text-light);
+}
+
+.game-status-block {
+    text-align: center;
+    padding: var(--spacing-sm);
+}
+
+@media (max-width: 600px) {
+    .game-board-container {
+        padding: var(--spacing-sm);
+        gap: var(--spacing-md);
+        /* Reset any large gaps if handled by flex-gap in container, 
+           NOTE: .main-play-area handles the big gaps */
+    }
+
+    .game-header {
+        font-size: 1.1rem;
+        margin-bottom: var(--spacing-md);
+        padding-bottom: var(--spacing-xs);
+    }
+
+    .players-strip {
+        gap: var(--spacing-sm);
+        margin-bottom: var(--spacing-md);
+    }
+
+    .game-player-card {
+        min-width: 70px;
+        padding: 6px;
+        flex: 1 1 auto;
+        /* Distribute space */
+        max-width: 100px;
+    }
+
+    .player-avatar {
+        font-size: 1.2rem;
+        margin-bottom: 2px;
+    }
+
+    .player-name {
+        font-size: 0.8rem;
+    }
+
+    .player-hand-count {
+        font-size: 0.7rem;
+    }
+
+    .main-play-area {
+        gap: var(--spacing-md);
+        justify-content: space-between;
+        /* Distribute space if height is constrained */
+    }
+
+    .my-card-section {
+        /* Remove scale to fit width */
+        transform: none;
+        width: 100%;
+        max-width: 280px;
+        /* Limit width to keep aspect ratio sane */
+        margin: 0 auto;
+    }
+
+    /* Target the Card component inside my-card-section if possible to reduce its size */
+    /* Assuming Card uses local styles or is responsive. 
+       If Card fixed width is an issue, we might need a scaler container. */
+
+    .controls-section {
+        width: 100%;
+    }
+
+    .buttons-grid {
+        gap: var(--spacing-sm);
+    }
+
+    .cat-btn {
+        padding: 8px;
+        font-size: 0.9rem;
+    }
+
+    .waiting-message {
+        margin-top: var(--spacing-md);
+    }
 }

@@ -237,7 +237,7 @@ const CardStudio = ({ deck, updateDeck, onSave, currentIndex = 0, onNavigate, is
                             <select
                                 value={source}
                                 onChange={(e) => setSource(e.target.value)}
-                                style={{ background: 'var(--surface-alt)', border: '1px solid var(--glass-border)', color: 'var(--text)', padding: '4px', borderRadius: '4px' }}
+                                style={{ background: 'var(--surface-alt)', border: '1px solid var(--glass-border)', color: 'var(--text-ink)', padding: '4px', borderRadius: '4px' }}
                             >
                                 <option value="wikimedia">Wikimedia (Commons)</option>
                                 <option value="openverse">Openverse (Creative Commons)</option>

@@ -18,12 +18,13 @@
 .review-header h2 {
     font-size: 1rem;
     font-weight: 600;
-    color: var(--text);
+    color: var(--text-ink);
 }
 
 .step-indicator {
     font-size: 0.8rem;
-    color: var(--text-dim);
+    color: var(--text-ink);
+    opacity: 0.6;
     font-variant-numeric: tabular-nums;
 }
 
@@ -52,6 +53,7 @@
 /* Overrides for UI components in this context */
 .category-input-override .input-field {
     background: rgba(0, 0, 0, 0.2);
+    color: var(--text-light);
     border-color: transparent;
     padding: 4px 8px;
 }

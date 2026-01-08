@@ -51,7 +51,7 @@ const DeckDetail = ({ deckId, onBack }) => {
                 </div>
             </div>
 
-            <h2 className="deck-title gradient-text">{deck.name} <span className="deck-theme">({deck.theme})</span></h2>
+            <h2 className="deck-title gradient-text">{deck.name}</h2>
 
             {viewMode === 'grid' ? (
                 <div className="modern-grid">

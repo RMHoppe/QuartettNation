@@ -3,19 +3,36 @@ import { Button } from '../ui';
 import './GameLobby.css';
 
 const GameLobby = ({ matchId, players, isHost, onStart }) => {
-    const copyLink = () => {
-        navigator.clipboard.writeText(window.location.href);
-        alert('Link copied to clipboard!');
+    const [copyState, setCopyState] = React.useState('Copy Link');
+
+    const copyLink = async () => {
+        try {
+            await navigator.clipboard.writeText(window.location.href);
+            setCopyState('Copied!');
+            setTimeout(() => setCopyState('Copy Link'), 2000);
+        } catch (err) {
+            console.error('Failed to copy class', err);
+            // Fallback
+            const textArea = document.createElement("textarea");
+            textArea.value = window.location.href;
+            document.body.appendChild(textArea);
+            textArea.select();
+            document.execCommand("Copy");
+            textArea.remove();
+            setCopyState('Copied!');
+            setTimeout(() => setCopyState('Copy Link'), 2000);
+        }
     };
 
     return (
-        <div className="page-view app-card">
+        <div className="page-view app-card centered" style={{ maxWidth: '800px' }}>
             <div className="lobby-header" style={{ paddingTop: 0 }}>
                 {/* Title moved to app header */}
                 <p className="lobby-subtitle" style={{ marginTop: 0 }}>Waiting for players to join...</p>
                 <div className="match-id-container">
+                    <span className="match-code-label">CODE:</span>
                     <code className="match-code">{matchId}</code>
-                    <Button variant="secondary" size="sm" onClick={copyLink}>Copy Link</Button>
+                    <Button variant="secondary" size="sm" onClick={copyLink}>{copyState}</Button>
                 </div>
             </div>
 

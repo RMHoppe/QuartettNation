@@ -6,7 +6,7 @@
 }
 
 .model-selector label {
-    color: var(--text-dim);
+    color: var(--text-light);
     font-size: 0.85rem;
 }
 
@@ -15,7 +15,7 @@
     border-radius: 6px;
     border: 1px solid var(--border);
     background: var(--surface);
-    color: var(--text);
+    color: var(--text-ink);
     font-size: 0.85rem;
     cursor: pointer;
 }
@@ -26,6 +26,6 @@
 }
 
 .model-selector-loading {
-    color: var(--text-dim);
+    color: var(--text-light);
     font-size: 0.8rem;
 }

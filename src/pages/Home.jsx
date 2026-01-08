@@ -28,27 +28,19 @@ const Home = () => {
         : 'Guest';
 
     return (
-        <div className="page-view app-card centered" style={{ gap: '2rem' }}>
+        <div className="page-view app-card centered home-view">
             <div style={{ textAlign: 'center' }}>
                 <h1 className="hero-title gradient-text">Challenge your friends</h1>
                 <p className="hero-subtitle">Generate unique Top Trump decks using AI.</p>
             </div>
 
-            <div className="auth-status-card" style={{
-                background: 'var(--bg-secondary)',
-                padding: '1.5rem',
-                borderRadius: 'var(--radius-lg)',
-                border: '1px solid var(--border)',
-                width: '100%',
-                maxWidth: '400px',
-                textAlign: 'center'
-            }}>
+            <div className="auth-status-card">
                 <div style={{ marginBottom: '1rem' }}>
-                    <span className="text-dim" style={{ fontSize: '0.9rem' }}>Currently playing as:</span>
-                    <h3 style={{ margin: '4px 0', color: user ? 'var(--primary)' : 'var(--text-main)' }}>
+                    <span style={{ color: 'var(--text-ink)', opacity: 0.7, fontSize: '0.9rem' }}>Currently playing as:</span>
+                    <h3 style={{ margin: '4px 0', color: user ? 'var(--primary)' : 'var(--text-ink)' }}>
                         {displayName}
                     </h3>
-                    {user && <span className="text-dim" style={{ fontSize: '0.8rem' }}>{user.email}</span>}
+                    {user && <span style={{ color: 'var(--text-ink)', opacity: 0.7, fontSize: '0.8rem' }}>{user.email}</span>}
                 </div>
 
                 {user ? (
@@ -69,7 +61,7 @@ const Home = () => {
                 <Link to="/collection" className="btn btn-secondary" style={{ minWidth: '160px', textAlign: 'center' }}>My Collection</Link>
             </div>
 
-            <div className="recent-games" style={{ width: '100%', maxWidth: '400px' }}>
+            <div className="recent-games">
                 <EmptyState message="No active games." />
             </div>
         </div>

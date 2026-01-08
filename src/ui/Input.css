@@ -11,7 +11,6 @@
 .input-label {
     font-size: 0.875rem;
     font-weight: 500;
-    color: var(--text-dim);
 }
 
 .input-field {
@@ -19,7 +18,7 @@
     background: var(--surface);
     border: 1px solid var(--glass-border);
     border-radius: var(--radius-sm);
-    color: var(--text);
+    color: var(--text-ink);
     font-size: 1rem;
     font-family: inherit;
     transition: border-color 0.2s, box-shadow 0.2s;

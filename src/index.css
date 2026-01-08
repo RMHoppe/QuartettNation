@@ -30,8 +30,6 @@
 
   /* Legacy Mapping (To be removed after refactor) */
   --text: var(--text-light);
-  --text-dim: rgba(240, 234, 214, 0.7);
-  /* Opacity Main */
   --text-inverse: var(--text-ink);
   --accent: var(--text-gold);
 
@@ -102,7 +100,7 @@ body {
   /* Important: SVG filter on body can affect fixed inputs, so usually best on a pseudo or wrapper.
      But for simple app, body is fine. If performance drags, move to a fixed div background. */
 
-  color: var(--text);
+  color: var(--text-light);
   line-height: 1.5;
   overflow-x: hidden;
   min-height: 100vh;
@@ -214,7 +212,6 @@ button {
 
 /* Enforce dark text hierarchy on paper lists */
 .modern-list-item small,
-.modern-list-item .text-dim,
 .modern-list-item .description {
   color: var(--text-ink);
   opacity: 0.7;
@@ -254,7 +251,7 @@ button {
 /* "The Game Box" */
 .app-card {
   max-width: 800px;
-  margin: var(--spacing-lg) 0;
+  margin: 0 0 var(--spacing-lg) 0;
   border-radius: var(--radius-lg);
   background: var(--surface);
   /* Box interior? or Cardboard */
@@ -263,7 +260,7 @@ button {
   border: 2px solid #362b24;
   box-shadow: var(--shadow-lg), inset 0 0 40px rgba(0, 0, 0, 0.5);
   padding: var(--spacing-lg);
-  color: var(--text-primary);
+  color: var(--text-light);
   /* on dark brown background */
 }
 
@@ -326,10 +323,74 @@ button {
   font-size: 1rem;
   text-transform: uppercase;
   letter-spacing: 0.1em;
-  color: var(--text-dim);
-  border-bottom: 1px solid var(--text-dim);
+  color: var(--text-gold);
+  border-bottom: 1px solid var(--text-gold);
+  display: inline-block;
+  color: var(--text-gold);
+  border-bottom: 1px solid var(--text-gold);
   display: inline-block;
   padding-bottom: 4px;
+}
+
+.home-view {
+  gap: 2rem;
+}
+
+.auth-status-card {
+  background: var(--surface);
+  padding: 1.5rem;
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--border-color);
+  /* Changed from var(--border) which might be undefined */
+  width: 100%;
+  max-width: 400px;
+  text-align: center;
+}
+
+.recent-games {
+  width: 100%;
+  max-width: 400px;
+}
+
+@media (max-width: 600px) {
+  .home-view {
+    gap: 1rem;
+    padding: var(--spacing-sm);
+    /* Override app-card padding if necessary, but app-card has spacing-lg (24px). 
+       Maybe reduce app-card padding globally on mobile? See below. */
+  }
+
+  .home-view .hero-title {
+    font-size: 2rem;
+    margin-bottom: 4px;
+  }
+
+  .home-view .hero-subtitle {
+    font-size: 0.9rem;
+  }
+
+  .auth-status-card {
+    padding: 1rem;
+    margin: 0;
+  }
+
+  .action-buttons {
+    flex-direction: column;
+    width: 100%;
+    max-width: 300px;
+  }
+
+  .action-buttons .btn {
+    width: 100%;
+  }
+}
+
+/* Global Mobile Adjustments */
+@media (max-width: 600px) {
+  .app-card {
+    padding: var(--spacing-md);
+    margin: var(--spacing-sm) 0;
+  }
 }
 
 /* --- Form & Inputs --- */

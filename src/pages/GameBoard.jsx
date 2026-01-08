@@ -51,12 +51,22 @@ const GameBoard = ({ matchId, gameState, myPlayer, deck, actions, isMyTurn }) =>
     return (
         <div className="game-board-container">
             {/* Header Info */}
+            {/* Header Info - Simplified */}
             <div className="game-header">
-                <div className="turn-indicator">
-                    {isMyTurn ? "YOUR TURN" : `${gameState.players.find(p => p.id === gameState.turnPlayerId)?.name}'s Turn`}
-                </div>
-                <div className="pot-indicator">
-                    Pot: {potSize} cards {isWar && <span className="war-badge">WAR!</span>}
+                {/* Game Status / Instructions moved here as requested */}
+                <div className="game-status-block">
+                    <div className="turn-indicator" style={{ fontSize: '1.2rem' }}>
+                        {isMyTurn
+                            ? <span className="text-primary animate-pulse">YOUR TURN: Select a category &darr;</span>
+                            : <span>{gameState.players.find(p => p.id === gameState.turnPlayerId)?.name}'s Turn</span>
+                        }
+                    </div>
+                    {isWar && <span className="war-badge">WAR!</span>}
+                    {!isMyTurn && !isEliminated && !winner && (
+                        <div className="waiting-message" style={{ marginTop: '0.5rem', fontSize: '0.9rem', opacity: 0.7 }}>
+                            Waiting for opponent...
+                        </div>
+                    )}
                 </div>
             </div>
 
@@ -74,26 +84,12 @@ const GameBoard = ({ matchId, gameState, myPlayer, deck, actions, isMyTurn }) =>
             {/* Header Info */}
 
             {/* Opponents Area */}
-            <div className="opponents-strip">
-                {gameState.players.filter(p => p.id !== myPlayer.id).map(p => (
-                    <div key={p.id} className={`opponent-card ${p.id === gameState.turnPlayerId ? 'active-turn' : ''} ${p.eliminated ? 'eliminated-p' : ''}`}>
-                        <div className="opponent-avatar">👤</div>
-                        <div className="opponent-name">{p.name}</div>
-                        <div className="opponent-hand-count">{p.hand.length} cards</div>
-                    </div>
-                ))}
-            </div>
+            {/* Players Strip (All Players) */}
+            {/* Players Strip moved to main-play-area */}
 
             {/* Main Play Area */}
             <div className="main-play-area">
-                {/* My Stats / Avatar */}
-                <div className="my-player-info" style={{ display: 'flex', gap: '1rem', alignItems: 'center', marginBottom: '1rem', justifyContent: 'center' }}>
-                    <div className="opponent-avatar" style={{ background: '#4CAF50' }}>👤</div>
-                    <div className="my-info-text" style={{ textAlign: 'left' }}>
-                        <div style={{ fontWeight: 'bold' }}>{myPlayer.name} (You)</div>
-                        <div style={{ fontSize: '0.9em', opacity: 0.8 }}>{myPlayer.hand.length} cards</div>
-                    </div>
-                </div>
+                {/* My Stats removed (moved to strip) */}
 
                 {/* My Card */}
                 <div className="my-card-section">
@@ -110,27 +106,30 @@ const GameBoard = ({ matchId, gameState, myPlayer, deck, actions, isMyTurn }) =>
                     )}
                 </div>
 
+                {/* Players Strip (moved below card) */}
+                <div className="players-strip" style={{ marginBottom: 0 }}>
+                    {gameState.players.map(p => {
+                        const isMe = p.id === myPlayer.id;
+                        const isTurn = p.id === gameState.turnPlayerId;
+                        return (
+                            <div key={p.id} className={`game-player-card ${isTurn ? 'active-turn' : ''} ${p.eliminated ? 'eliminated-p' : ''} ${isMe ? 'my-player-card' : ''}`}>
+                                <div className="player-avatar">{isMe ? '👤' : '👤'}</div>
+                                <div className="player-name">{p.name} {isMe && '(You)'}</div>
+                                <div className="player-hand-count">{p.hand.length} cards</div>
+                            </div>
+                        );
+                    })}
+                </div>
+
                 {/* Controls */}
                 <div className="controls-section">
+
+                    {/* Game Status Block moved to Header */}
 
                     {isEliminated && (
                         <div className="eliminated-message">
                             <h3>You have been eliminated</h3>
                             <p>Spectating the game...</p>
-                        </div>
-                    )}
-
-                    {!isEliminated && isMyTurn && !winner && (
-                        <div className="text-center text-primary mt-4 animate-pulse">
-                            &uarr; Select a category on the card above &uarr;
-                        </div>
-                    )}
-
-
-
-                    {!isEliminated && !isMyTurn && (
-                        <div className="waiting-message">
-                            Waiting for opponent...
                         </div>
                     )}
 
@@ -163,5 +162,6 @@ const GameBoard = ({ matchId, gameState, myPlayer, deck, actions, isMyTurn }) =>
         </div>
     );
 };
+
 
 export default GameBoard;
