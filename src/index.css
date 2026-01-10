@@ -253,7 +253,6 @@ button {
   max-width: 800px;
   margin: 0 0 var(--spacing-lg) 0;
   border-radius: var(--radius-lg);
-  background: var(--surface);
   /* Box interior? or Cardboard */
   background: #4a3b32;
   /* Leather/Box color */
@@ -323,9 +322,6 @@ button {
   font-size: 1rem;
   text-transform: uppercase;
   letter-spacing: 0.1em;
-  color: var(--text-gold);
-  border-bottom: 1px solid var(--text-gold);
-  display: inline-block;
   color: var(--text-gold);
   border-bottom: 1px solid var(--text-gold);
   display: inline-block;
@@ -404,7 +400,6 @@ button {
 .input-group label {
   font-size: 0.9rem;
   font-weight: 700;
-  color: var(--text-inverse);
   /* On dark background usually */
   text-transform: uppercase;
   font-family: 'Courier New', monospace;

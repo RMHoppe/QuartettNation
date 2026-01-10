@@ -110,7 +110,7 @@ const CreateDeck = () => {
                     {/* Size Selector and Generate Button remain same... */}
                     <div className="input-group">
                         <label>Number of Cards</label>
-                        <div className="size-selector" style={{ display: 'flex', gap: '10px' }}>
+                        <div className="size-selector" style={{ display: 'flex' }}>
                             {[12, 16, 24, 32].map(size => (
                                 <Button
                                     key={size}

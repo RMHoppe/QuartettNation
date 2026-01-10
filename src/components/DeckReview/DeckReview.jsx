@@ -5,7 +5,7 @@ import './DeckReview.css'
 import '../Loading.css'
 import CategoryReview from './CategoryReview'
 import CardNameReview from './CardNameReview'
-import ImageGridReview from './ImageGridReview'
+import StatsReview from './StatsReview'
 
 import { generateCardNames, generateCardDetails } from '../../services/gemini'
 
@@ -106,7 +106,7 @@ const DeckReview = ({ initialPartialDeck, onSave, onCancel, theme, targetCount =
                     <CardNameReview deck={deck} updateDeck={updateDeck} onNext={handleNamesConfirmed} />
                 )}
                 {step === 3 && (
-                    <ImageGridReview deck={deck} updateDeck={updateDeck} updateCard={updateCard} onSave={() => onSave(deck)} />
+                    <StatsReview deck={deck} updateDeck={updateDeck} updateCard={updateCard} onSave={() => onSave(deck)} />
                 )}
             </div>
         </div>

@@ -6,7 +6,6 @@
 }
 
 .model-selector label {
-    color: var(--text-light);
     font-size: 0.85rem;
 }
 
@@ -26,6 +25,5 @@
 }
 
 .model-selector-loading {
-    color: var(--text-light);
     font-size: 0.8rem;
 }

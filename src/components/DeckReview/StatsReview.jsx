@@ -1,13 +1,13 @@
 import React, { useState, useEffect } from 'react'
 import CardStudio from './CardStudio'
-import './CardGridReview.css'
+import './StatsReview.css'
 import Card from '../Card/Card'
 import { Button, Modal } from '../../ui'
 import { Pencil } from 'lucide-react'
 import { searchImages } from '../../services/wikimedia'
 
 // Lazily load image if missing, but render proper Card component
-const GridCardItem = ({ card, index, onEdit, onImageLoaded, categories, deckName }) => {
+const ReviewCardItem = ({ card, index, onEdit, onImageLoaded, categories, deckName }) => {
     const fetching = React.useRef(false)
 
     // Auto-fetch image if missing
@@ -56,7 +56,7 @@ const GridCardItem = ({ card, index, onEdit, onImageLoaded, categories, deckName
     )
 }
 
-const CardGridReview = ({ deck, updateDeck, updateCard, onSave }) => {
+const StatsReview = ({ deck, updateDeck, updateCard, onSave }) => {
     const [selectedCardIndex, setSelectedCardIndex] = useState(null)
 
     const handleEditClick = (index) => {
@@ -93,9 +93,9 @@ const CardGridReview = ({ deck, updateDeck, updateCard, onSave }) => {
             <div className="image-grid-review">
                 <p className="hint-text">Review your cards. Click the pen icon to edit images or stats.</p>
 
-                <div className="modern-grid">
+                <div className="modern-list">
                     {deck.cards.map((card, idx) => (
-                        <GridCardItem
+                        <ReviewCardItem
                             key={idx}
                             card={card}
                             index={idx}
@@ -117,4 +117,4 @@ const CardGridReview = ({ deck, updateDeck, updateCard, onSave }) => {
     )
 }
 
-export default CardGridReview
+export default StatsReview

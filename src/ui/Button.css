@@ -4,6 +4,7 @@
     justify-content: center;
     gap: var(--spacing-sm);
     padding: 0.5rem 1rem;
+    margin: 0 var(--spacing-sm);
     font-weight: 700;
     font-family: 'Courier New', monospace;
     text-transform: uppercase;
@@ -21,7 +22,7 @@
 
 /* Fallback spacing */
 .btn+.btn {
-    margin-left: var(--spacing-sm);
+    margin-left: 0;
 }
 
 .btn-group>.btn+.btn,
@@ -113,10 +114,6 @@ div[class*="flex"][class*="gap"]>.btn+.btn {
     filter: grayscale(0.8);
     transform: none;
     box-shadow: none;
-}
-
-.btn-full {
-    width: 100%;
 }
 
 /* Loading */
