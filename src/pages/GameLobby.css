@@ -31,7 +31,7 @@
 }
 
 .match-code-label {
-    font-size: 0.8rem;
+    font-size: 1rem;
     font-weight: bold;
     color: var(--text-ink);
     opacity: 0.6;
@@ -42,11 +42,15 @@
     padding: 2px 8px;
     border: 1px solid var(--border-color);
     font-family: 'Courier New', monospace;
-    font-size: 0.8rem;
-    letter-spacing: 2px;
+    font-size: 1rem;
+    letter-spacing: 0;
     color: var(--text-ink);
     font-weight: bold;
     transform: rotate(-1deg);
+    max-width: 200px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
 }
 
 .player-slot {
@@ -96,7 +100,7 @@
 }
 
 .player-label {
-    font-size: 0.75rem;
+    font-size: 1rem;
     color: var(--text-ink);
     opacity: 0.6;
     margin-top: var(--spacing-xs);
@@ -106,7 +110,7 @@
 
 .open-slot-text {
     color: var(--text-ink);
-    font-size: 0.85rem;
+    font-size: 1rem;
 }
 
 .lobby-footer {
@@ -156,7 +160,7 @@
     }
 
     .player-name {
-        font-size: 0.9rem;
+        font-size: 1rem;
     }
 
     .lobby-header {
@@ -166,4 +170,21 @@
     .lobby-footer {
         padding-top: var(--spacing-sm);
     }
+}
+
+/* Explicit Overrides */
+.lobby-card {
+    max-width: 800px;
+}
+
+.lobby-header-reset {
+    padding-top: 0;
+}
+
+.lobby-subtitle-reset {
+    margin-top: 0;
+}
+
+.player-avatar-placeholder {
+    opacity: 0.3;
 }

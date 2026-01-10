@@ -125,6 +125,7 @@ body {
     radial-gradient(circle at 20% 20%, rgba(0, 0, 0, 0.4), transparent 50%),
     radial-gradient(circle at 50% 50%, var(--background), transparent 80%);
   z-index: 0;
+  font-weight: 600;
 }
 
 body::before {
@@ -266,7 +267,7 @@ button {
 .gradient-text {
   /* Vintage Gold Stamp effect */
   background: none;
-  color: var(--text-accent);
+  color: var(--text-gold);
   text-shadow: 0 1px 2px rgba(0, 0, 0, 0.6);
   -webkit-text-stroke: 0;
   -webkit-text-fill-color: unset;
@@ -277,6 +278,7 @@ button {
 .modern-grid {
   display: grid;
   gap: var(--spacing-md);
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
 }
 
 /* --- Page & View Containers --- */
@@ -362,7 +364,7 @@ button {
   }
 
   .home-view .hero-subtitle {
-    font-size: 0.9rem;
+    font-size: 1rem;
   }
 
   .auth-status-card {
@@ -398,7 +400,7 @@ button {
 }
 
 .input-group label {
-  font-size: 0.9rem;
+  font-size: 1rem;
   font-weight: 700;
   /* On dark background usually */
   text-transform: uppercase;
@@ -444,4 +446,84 @@ select:focus {
 .link-back:hover {
   text-decoration: underline;
   transform: translateX(-4px);
+}
+
+/* Auth Page Styles */
+.auth-page-container {
+  min-height: 80vh;
+  justify-content: center;
+}
+
+.auth-panel {
+  padding: 2rem;
+  width: 100%;
+  max-width: 400px;
+}
+
+.auth-title {
+  text-align: center;
+  margin-bottom: 1.5rem;
+}
+
+.auth-error {
+  background: rgba(239, 68, 68, 0.2);
+  border: 1px solid var(--danger);
+  padding: 1rem;
+  border-radius: 8px;
+  margin-bottom: 1rem;
+  font-size: 1rem;
+}
+
+.auth-form {
+  gap: 1.5rem;
+}
+
+.auth-footer {
+  color: var(--text-ink);
+  opacity: 0.7;
+  margin-top: 1.5rem;
+  text-align: center;
+  font-size: 1rem;
+}
+
+.auth-switch-btn {
+  margin-left: 0.5rem;
+  color: var(--primary);
+  font-weight: 600;
+  text-decoration: underline;
+}
+
+/* Home Page Styles */
+.home-hero-section {
+  text-align: center;
+}
+
+.home-user-info {
+  margin-bottom: 1rem;
+}
+
+.home-user-label {
+  color: var(--text-ink);
+  opacity: 0.7;
+  font-size: 1rem;
+}
+
+.home-user-name {
+  margin: 4px 0;
+  color: var(--text-ink);
+}
+
+.home-user-name.authenticated {
+  color: var(--primary);
+}
+
+.home-user-email {
+  color: var(--text-ink);
+  opacity: 0.7;
+  font-size: 1rem;
+}
+
+.home-action-btn {
+  min-width: 160px;
+  text-align: center;
 }

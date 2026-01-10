@@ -54,7 +54,7 @@ const DeckDetail = ({ deckId, onBack }) => {
             <h2 className="deck-title gradient-text">{deck.name}</h2>
 
             {viewMode === 'grid' ? (
-                <div className="modern-grid">
+                <div className="modern-list">
                     {deck.cards.map(card => (
                         <Card
                             key={card.id}

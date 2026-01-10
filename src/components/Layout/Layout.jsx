@@ -29,14 +29,14 @@ const Layout = ({ children }) => {
                 {isHome ? (
                     <Link to="/" className="logo">Quartett<span>Nation</span></Link>
                 ) : (
-                    <div className="header-dynamic" style={{ display: 'flex', alignItems: 'center', width: '100%', padding: '0 var(--spacing-md)' }}>
+                    <div className="header-dynamic">
                         {backTo && (
-                            <Button variant="ghost" size="sm" onClick={handleBack} style={{ paddingLeft: 0, marginRight: 'var(--spacing-md)' }}>
-                                <ArrowLeft size={20} style={{ marginRight: '4px' }} />
+                            <Button variant="ghost" size="sm" onClick={handleBack} className="header-back-btn">
+                                <ArrowLeft size={20} className="header-back-icon" />
                                 Back
                             </Button>
                         )}
-                        <h2 className="header-title gradient-text" style={{ fontSize: '1.2rem', margin: 0, flex: 1, textAlign: 'center', paddingRight: backTo ? '60px' : '0' }}>{title}</h2>
+                        <h2 className={`header-title gradient-text ${backTo ? 'with-back' : ''}`}>{title}</h2>
                     </div>
                 )}
                 {customContent}

@@ -9,7 +9,7 @@
 }
 
 .input-label {
-    font-size: 0.875rem;
+    font-size: 1rem;
     font-weight: 500;
 }
 
@@ -40,6 +40,6 @@
 }
 
 .input-error-text {
-    font-size: 0.8rem;
+    font-size: 1rem;
     color: var(--danger);
 }

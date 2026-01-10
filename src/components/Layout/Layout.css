@@ -30,12 +30,14 @@
 .logo {
     font-size: 1.5rem;
     font-weight: 800;
+    color: var(--text-light);
     letter-spacing: -0.5px;
     text-decoration: none;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
 }
 
 .logo span {
-    color: var(--primary);
+    color: var(--text-gold);
 }
 
 .app-main {
@@ -70,7 +72,7 @@
     border: none;
     color: var(--text-light);
     opacity: 0.7;
-    font-size: 0.9rem;
+    font-size: 1rem;
     font-weight: 500;
     text-decoration: none;
     transition: all 0.2s ease;
@@ -80,4 +82,32 @@
     color: var(--primary);
     background: rgba(255, 107, 107, 0.1);
     box-shadow: inset 0 -2px 0 var(--primary);
+}
+
+/* Refactored Header Styles */
+.header-dynamic {
+    display: flex;
+    align-items: center;
+    width: 100%;
+    padding: 0 var(--spacing-md);
+}
+
+.header-back-btn {
+    padding-left: 0 !important;
+    margin-right: var(--spacing-md);
+}
+
+.header-back-icon {
+    margin-right: 4px;
+}
+
+.header-title {
+    font-size: 1.2rem;
+    margin: 0;
+    flex: 1;
+    text-align: center;
+}
+
+.header-title.with-back {
+    padding-right: 60px;
 }

@@ -49,26 +49,19 @@ const Auth = () => {
     }
 
     return (
-        <div className="page-view centered" style={{ minHeight: '80vh', justifyContent: 'center' }}>
-            <div className="glass-panel" style={{ padding: '2rem', width: '100%', maxWidth: '400px' }}>
-                <h2 style={{ textAlign: 'center', marginBottom: '1.5rem' }}>
+        <div className="page-view centered auth-page-container">
+            <div className="glass-panel auth-panel">
+                <h2 className="auth-title">
                     {isSignUp ? 'Create Account' : 'Welcome Back'}
                 </h2>
 
                 {error && (
-                    <div style={{
-                        background: 'rgba(239, 68, 68, 0.2)',
-                        border: '1px solid var(--danger)',
-                        padding: '1rem',
-                        borderRadius: '8px',
-                        marginBottom: '1rem',
-                        fontSize: '0.9rem'
-                    }}>
+                    <div className="auth-error">
                         {error}
                     </div>
                 )}
 
-                <form onSubmit={handleAuth} className="input-group" style={{ gap: '1.5rem' }}>
+                <form onSubmit={handleAuth} className="input-group auth-form">
                     {isSignUp && (
                         <div className="input-group">
                             <label>Username</label>
@@ -107,16 +100,11 @@ const Auth = () => {
                     </Button>
                 </form>
 
-                <div style={{ color: 'var(--text-ink)', opacity: 0.7, marginTop: '1.5rem', textAlign: 'center', fontSize: '0.9rem' }}>
+                <div className="auth-footer">
                     {isSignUp ? 'Already have an account?' : "Don't have an account?"}
                     <button
                         onClick={() => setIsSignUp(!isSignUp)}
-                        style={{
-                            marginLeft: '0.5rem',
-                            color: 'var(--primary)',
-                            fontWeight: '600',
-                            textDecoration: 'underline'
-                        }}
+                        className="auth-switch-btn"
                     >
                         {isSignUp ? 'Log In' : 'Sign Up'}
                     </button>

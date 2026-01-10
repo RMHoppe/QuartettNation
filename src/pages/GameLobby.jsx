@@ -25,13 +25,13 @@ const GameLobby = ({ matchId, players, isHost, onStart }) => {
     };
 
     return (
-        <div className="page-view app-card centered" style={{ maxWidth: '800px' }}>
-            <div className="lobby-header" style={{ paddingTop: 0 }}>
+        <div className="page-view app-card centered lobby-card">
+            <div className="lobby-header lobby-header-reset">
                 {/* Title moved to app header */}
-                <p className="lobby-subtitle" style={{ marginTop: 0 }}>Waiting for players to join...</p>
+                <p className="lobby-subtitle lobby-subtitle-reset">Waiting for players to join...</p>
                 <div className="match-id-container">
-                    <span className="match-code-label">CODE:</span>
-                    <code className="match-code">{matchId}</code>
+                    <span className="match-code-label">LINK:</span>
+                    <code className="match-code">{window.location.href}</code>
                     <Button variant="secondary" size="sm" onClick={copyLink}>{copyState}</Button>
                 </div>
             </div>
@@ -49,7 +49,7 @@ const GameLobby = ({ matchId, players, isHost, onStart }) => {
                                 </>
                             ) : (
                                 <>
-                                    <div className="player-avatar" style={{ opacity: 0.3 }}>?</div>
+                                    <div className="player-avatar player-avatar-placeholder">?</div>
                                     <div className="open-slot-text">Slot Open</div>
                                     <div className="player-label">Player {idx + 1}</div>
                                 </>

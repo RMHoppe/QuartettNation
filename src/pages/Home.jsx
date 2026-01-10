@@ -29,18 +29,18 @@ const Home = () => {
 
     return (
         <div className="page-view app-card centered home-view">
-            <div style={{ textAlign: 'center' }}>
+            <div className="home-hero-section">
                 <h1 className="hero-title gradient-text">Challenge your friends</h1>
                 <p className="hero-subtitle">Generate unique Top Trump decks using AI.</p>
             </div>
 
             <div className="auth-status-card">
-                <div style={{ marginBottom: '1rem' }}>
-                    <span style={{ color: 'var(--text-ink)', opacity: 0.7, fontSize: '0.9rem' }}>Currently playing as:</span>
-                    <h3 style={{ margin: '4px 0', color: user ? 'var(--primary)' : 'var(--text-ink)' }}>
+                <div className="home-user-info">
+                    <span className="home-user-label">Currently playing as:</span>
+                    <h3 className={`home-user-name ${user ? 'authenticated' : ''}`}>
                         {displayName}
                     </h3>
-                    {user && <span style={{ color: 'var(--text-ink)', opacity: 0.7, fontSize: '0.8rem' }}>{user.email}</span>}
+                    {user && <span className="home-user-email">{user.email}</span>}
                 </div>
 
                 {user ? (
@@ -57,8 +57,8 @@ const Home = () => {
             </div>
 
             <div className="action-buttons">
-                <Link to="/create" className="btn btn-primary" style={{ minWidth: '160px', textAlign: 'center' }}>Create New Deck</Link>
-                <Link to="/collection" className="btn btn-secondary" style={{ minWidth: '160px', textAlign: 'center' }}>My Collection</Link>
+                <Link to="/create" className="btn btn-primary home-action-btn">Create New Deck</Link>
+                <Link to="/collection" className="btn btn-secondary home-action-btn">My Collection</Link>
             </div>
 
             <div className="recent-games">

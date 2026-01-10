@@ -5,7 +5,7 @@
 }
 
 .select-label {
-    font-size: 0.85rem;
+    font-size: 1rem;
     color: inherit;
     opacity: 0.8;
     white-space: nowrap;
@@ -17,7 +17,7 @@
     border: 1px solid var(--glass-border);
     border-radius: var(--radius-sm);
     color: var(--text-ink);
-    font-size: 0.9rem;
+    font-size: 1rem;
     font-family: inherit;
     cursor: pointer;
     transition: border-color 0.2s;
